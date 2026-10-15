@@ -11,9 +11,36 @@ function serious(violations: Awaited<ReturnType<AxeBuilder['analyze']>>['violati
   return violations.filter((v) => CRITICAL.includes(v.impact ?? ''));
 }
 
+/**
+ * En dev, Turbopack compila la ruta bajo demanda y los estilos llegan en
+ * stream; además la entrada de página anima opacidad 0→1 en 420 ms
+ * (PageFade). Medir contraste en medio de cualquiera de las dos da
+ * falsos positivos. Se espera a que el CSS esté aplicado (botón primario
+ * con la tinta del token) y a que la cadena de opacidad del titular sea
+ * completamente opaca.
+ */
+async function stylesSettled(page: import('@playwright/test').Page) {
+  await page.waitForFunction(
+    () => {
+      const btn = document.querySelector('.btn-primary');
+      if (!btn) return false;
+      if (getComputedStyle(btn).backgroundColor !== 'rgb(28, 23, 18)') return false;
+      let el = document.querySelector('main h1');
+      while (el && el instanceof HTMLElement) {
+        if (getComputedStyle(el).opacity !== '1') return false;
+        el = el.parentElement;
+      }
+      return true;
+    },
+    undefined,
+    { timeout: 20_000 }
+  );
+}
+
 test.describe('Accesibilidad axe', () => {
   test('home: sin violaciones críticas ni serias', async ({ page }) => {
     await page.goto('/');
+    await stylesSettled(page);
     const results = await new AxeBuilder({ page }).analyze();
     const bad = serious(results.violations);
     expect(
@@ -24,6 +51,7 @@ test.describe('Accesibilidad axe', () => {
 
   test('ficha: sin violaciones críticas ni serias', async ({ page }) => {
     await page.goto('/producto/sofa-norte-220');
+    await stylesSettled(page);
     const results = await new AxeBuilder({ page }).analyze();
     const bad = serious(results.violations);
     expect(
@@ -38,11 +66,11 @@ test.describe('Accesibilidad axe', () => {
     await page.getByRole('button', { name: /Agregar al carrito/ }).first().click();
     await expect(page.getByText('En el carrito')).toBeVisible();
     await page.goto('/checkout');
-    // En dev, Turbopack compila la ruta bajo demanda: se espera a que el
-    // formulario esté realmente renderizado antes de medir contraste.
+    // El formulario debe estar renderizado Y con los estilos aplicados.
     const submit = page.getByRole('button', { name: 'Crear pedido y transferir' });
     await expect(submit).toBeVisible();
     await expect(submit).toBeEnabled();
+    await stylesSettled(page);
 
     const results = await new AxeBuilder({ page }).analyze();
     const bad = serious(results.violations);

@@ -1,31 +1,9 @@
-# Deployment Guide
+# DEPLOY — NOMAHOME
 
-## Phase 10: Production Setup
+1. **Vercel**: importa el repo en vercel.com/new (detecta Next.js solo); agrega las variables de `.env.example` en Project → Settings → Environment Variables. La integración de GitHub queda instalada con ese import: cada push a `main` hace deploy, cada PR abre preview.
+2. **Supabase**: crea el proyecto en supabase.com, corre `npx supabase link --project-ref <ref>`, `npx supabase db push` (aplica las 3 migraciones) y `npx supabase gen types typescript > lib/supabase/database.types.ts`; activa "Promote to production" solo tras revisar el preview.
+3. **GitHub**: pestaña Security → activa secret scanning y "Push protection"; Insights → Community → "Set up security" para Dependabot (el archivo `.github/dependabot.yml` ya existe); la pestaña Actions ya trae CI con gitleaks y el workflow CodeQL (`.github/workflows/codeql.yml`).
+4. **Primer admin**: en Supabase → Authentication → Users crea tu cuenta, y en SQL editor: `update public.profiles set role = 'admin' where id = '<tu-uuid>';` — sin eso nadie ve `/admin`.
+5. **Secretos de cobro y factura**: pon `NEXT_PUBLIC_STORE_CLABE` (la CLABE del taller que verán los compradores) y `FACTURAPI_KEY` (llave de servidor de facturapi.io). Con `PAYMENTS_MODE=production` la simulación de pagos queda deshabilitada por completo.
 
-### GitHub
-
-1. Enable Dependabot: Settings → Code security & analysis → Dependabot
-2. Enable secret scanning: Settings → Code security & analysis
-3. Enable CodeQL: Settings → Code security & analysis → CodeQL
-4. Install GitHub integration in Supabase and Vercel projects
-
-### Supabase
-
-1. Create production database backup strategy
-2. Configure row-level security (RLS) on all tables
-3. Set up webhooks for payment provider
-
-### Vercel
-
-1. Link GitHub repository
-2. Configure environment variables (see .env.example)
-3. Set preview deployment for pull requests
-4. Enable analytics
-
-### Monitoring
-
-- Monitor Lighthouse scores in CI
-- Track Core Web Vitals
-- Review security headers in production
-
-For detailed steps, see INSTRUCCION.md phase 10.
+Local: `npx supabase start && npm run dev`. El seed (12 piezas, SVGs propios) se aplica con `npx supabase db reset`.
