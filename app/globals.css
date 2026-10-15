@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@layer base {
+  /* Remove default margins and paddings */
+  * {
+    @apply m-0 p-0;
+  }
+
+  html, body {
+    @apply w-full h-full;
+  }
+
+  /* Typography defaults */
+  h1 {
+    font-family: var(--font-display);
+    @apply text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold tracking-tight leading-none;
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    @apply text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight leading-tight;
+  }
+
+  h3 {
+    font-family: var(--font-display);
+    @apply text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight;
+  }
+
+  h4, h5, h6 {
+    font-family: var(--font-display);
+    @apply font-semibold leading-snug;
+  }
+
+  body, button, input, select, textarea {
+    font-family: var(--font-ui);
+  }
+
+  code, pre {
+    font-family: var(--font-mono);
+  }
+
+  /* Form elements */
+  button, input, select, textarea {
+    @apply outline-none;
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+
+  input, textarea, select {
+    @apply rounded-[var(--radius-m)];
+  }
+}
+
+@layer components {
+  .container-lumen {
+    @apply w-full max-w-[var(--max)] mx-auto px-[var(--space-4)] sm:px-[var(--space-6)];
+  }
+
+  .text-catalog {
+    font-family: var(--font-mono);
+    @apply text-xs uppercase tracking-[0.08em] text-[var(--ink-soft)];
+  }
+
+  .btn-primary {
+    @apply px-[var(--space-4)] py-[var(--space-3)] rounded-[var(--radius-m)] font-medium transition-colors;
+    @apply bg-[var(--ink)] text-[var(--paper)] hover:bg-[var(--ink-soft)];
+  }
+
+  .btn-secondary {
+    @apply px-[var(--space-4)] py-[var(--space-3)] rounded-[var(--radius-m)] font-medium transition-colors;
+    @apply bg-[var(--paper)] text-[var(--ink)] border border-[var(--line)] hover:bg-[var(--paper-2)];
+  }
+
+  .btn-disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .line-separator {
+    @apply border-b border-[var(--line)];
+  }
+}
+
+@layer utilities {
+  .truncate-lines-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .reduce-motion {
+    @apply motion-reduce:!transition-none motion-reduce:!animate-none;
+  }
+}

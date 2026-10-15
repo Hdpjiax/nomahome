@@ -1,0 +1,45 @@
+# Casa Lumen — Design & Security
+
+alwaysApply: true
+
+These rules apply in every file and every prompt.
+
+## Visual prohibitions
+
+Never:
+- Hero fullscreen text centered + gradient button
+- Three columns with icons (benefits pattern)
+- Auto-carousel
+- "Trusted by" logos
+- White testimonial cards with star emojis
+- Navbar with huge search + gray mega-menu
+- Product cards with shadow + blue "Add to cart"
+
+Use only:
+- Editorial grid (7 cols content + 5 cols text, asymmetric)
+- Mono SKU numbers (CL-SOF-220, tracking 0.08em)
+- Display typography (Fraunces, 64–112px desktop, -0.03em tracking)
+- Fixed header 64px, paper bg 92% + blur
+- Fillet separators (--line color)
+
+## Security prohibitions
+
+Never:
+- Mark `orders.status = paid` without webhook signature
+- Put `SUPABASE_SERVICE_ROLE_KEY` on `NEXT_PUBLIC_`
+- Disable RLS or trust `localStorage` roles
+- Use `any` or `@ts-ignore`
+- Calculate prices in browser only
+- Store card data
+- Generate fake XML/PDF invoices
+
+## Required
+
+- All amounts in centavos (integers), half-away-from-zero rounding
+- Shipping free >= 15,000 MXN; Michoacán 249 / rest of MX 399
+- IVA 16%, shown as included
+- Payment Brick (no card capture on server)
+- CFDI 4.0 with Facturapi SDK
+- Webhooks verified by signature
+- Admin auth checked server-side
+- RLS on all tables
