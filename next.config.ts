@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: {
+    // Los SVG del seed son piezas dibujadas por el taller, no contenido
+    // subido por usuarios. Con sandbox + attachment el navegador jamás
+    // los ejecuta como documento.
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
   cacheComponents: false,
   partialPrefetching: false,
   turbopack: {
@@ -22,10 +30,13 @@ const nextConfig: NextConfig = {
       "default-src 'self'",
       scriptSrc,
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: https:",
+      // self + data + Supabase (storage remoto en producción)
+      "img-src 'self' data: https://*.supabase.co",
       "font-src 'self' data:",
       "frame-src 'self'",
-      "connect-src 'self' https://*.supabase.co",
+      isProduction
+        ? "connect-src 'self' https://*.supabase.co"
+        : "connect-src 'self' https://*.supabase.co http://127.0.0.1:54321 http://localhost:54321",
     ];
 
     return [

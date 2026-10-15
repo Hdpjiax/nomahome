@@ -25,8 +25,10 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
   title: "NOMAHOME – Muebles y tecnología para vivir la casa",
   description: "Catálogo editorial de piezas únicas: muebles y tecnología del hogar desde Morelia.",
+  alternates: { canonical: '/' },
   openGraph: {
     type: "website",
     locale: "es_MX",
@@ -34,10 +36,10 @@ export const metadata: Metadata = {
     siteName: "NOMAHOME",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og.png",
         width: 1200,
         height: 630,
-        alt: "NOMAHOME",
+        alt: "NOMAHOME — Muebles y tecnología para vivir la casa",
       },
     ],
   },

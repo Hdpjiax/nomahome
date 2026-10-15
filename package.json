@@ -16,7 +16,8 @@
     "test:e2e:ui": "playwright test --ui",
     "db:types": "supabase gen types typescript --local > lib/supabase/database.types.ts",
     "db:lint": "node scripts/db-lint.mjs",
-    "seed:svgs": "node scripts/generate-seed-svg.mjs"
+    "seed:svgs": "node scripts/generate-seed-svg.mjs",
+    "og:png": "node scripts/generate-og.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.64.1",
+    "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^24.19.2",
     "@types/react": "^19",
