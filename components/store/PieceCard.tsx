@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import PriceTag from './PriceTag';
+import QuickAddSheet from './QuickAddSheet';
 import type { CatalogPiece } from '@/lib/catalog/types';
 
 type PieceCardProps = {
@@ -64,13 +65,7 @@ export default function PieceCard({ piece, withActions = false, priority = false
             <Link href={`/producto/${piece.slug}`} className="btn-primary text-sm">
               Ver pieza
             </Link>
-            <Link
-              href={`/producto/${piece.slug}/agregar`}
-              className="btn-secondary text-sm"
-              aria-label={`Agregar ${piece.name} al carrito`}
-            >
-              Agregar
-            </Link>
+            <QuickAddSheet piece={piece} />
           </div>
         ) : null}
       </div>

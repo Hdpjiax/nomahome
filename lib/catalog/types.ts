@@ -33,6 +33,10 @@ export type CatalogPiece = {
   sku: string;
   name: string;
   summary: string | null;
+  description: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  videoUrl: string | null;
   categories: { slug: string; name: string }[];
   variants: CatalogVariant[];
   /** Precio de vitrina: el más bajo entre sus variantes. IVA incluido. */
