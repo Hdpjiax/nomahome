@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000" role="img" aria-label="CL-LMT-045 Lámpara de mesa Pátzcuaro, color Latón">
+  <!-- Pieza de catálogo NOMAHOME — dibujo del taller, no fotografía -->
+  <rect width="800" height="1000" fill="#d8cfc2"/>
+
+  <g stroke="#1c1712" stroke-width="1.5" opacity="0.65">
+    <path d="M26 56 v-30 h30"/>
+    <path d="M774 56 v-30 h-30"/>
+    <path d="M26 944 v30 h30"/>
+    <path d="M774 944 v30 h-30"/>
+  </g>
+  <rect x="44" y="44" width="712" height="912" fill="none" stroke="rgba(28, 23, 18, 0.14)"/>
+
+  <text x="64" y="96" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="19" letter-spacing="4" fill="#4a433c">NOMAHOME · MORELIA</text>
+  <text x="736" y="96" text-anchor="end" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="19" letter-spacing="4" fill="#4a433c">PIEZA DE CATÁLOGO</text>
+
+  <g transform="translate(0, -20)">
+    
+  <line x1="180" y1="700" x2="620" y2="700" stroke="#1c1712" stroke-width="2" opacity="0.55"/>
+  <path d="M300 290 L500 290 L458 402 L342 402 Z" fill="#c4a27a" stroke="#1c1712" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="330" y1="316" x2="470" y2="316" stroke="#1c1712" stroke-width="1.5" opacity="0.4"/>
+  <line x1="338" y1="342" x2="462" y2="342" stroke="#1c1712" stroke-width="1.5" opacity="0.4"/>
+  <line x1="346" y1="368" x2="454" y2="368" stroke="#1c1712" stroke-width="1.5" opacity="0.4"/>
+  <rect x="394" y="402" width="12" height="196" fill="#8d6840" stroke="#1c1712" stroke-width="2"/>
+  <ellipse cx="400" cy="620" rx="86" ry="20" fill="#8d6840" stroke="#1c1712" stroke-width="3"/>
+  <path d="M270 244 q130 -60 260 0" fill="none" stroke="#c4a27a" stroke-width="3"/>
+  <path d="M310 214 q90 -40 180 0" fill="none" stroke="#c4a27a" stroke-width="2" opacity="0.6"/>
+  <circle cx="400" cy="620" r="7" fill="#1c1712"/>
+  </g>
+
+  <line x1="64" y1="884" x2="736" y2="884" stroke="rgba(28, 23, 18, 0.14)" stroke-width="2"/>
+  <text x="64" y="920" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="28" font-weight="600" letter-spacing="6" fill="#1c1712">CL-LMT-045</text>
+  <text x="64" y="944" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="17" letter-spacing="2" fill="#4a433c">LÁMPARA DE MESA PÁTZCUARO</text>
+
+  <rect x="596" y="926" width="22" height="22" rx="2" fill="#c4a27a" stroke="#1c1712" stroke-width="1.5"/>
+  <text x="630" y="944" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="17" letter-spacing="2" fill="#4a433c">LATÓN</text>
+</svg>

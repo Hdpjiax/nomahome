@@ -62,13 +62,6 @@ jobs:
 
       - name: E2E tests (Playwright)
         run: npm run test:e2e
-        if: vars.MERCADOPAGO_ACCESS_TOKEN != ''
-        env:
-          MERCADOPAGO_ACCESS_TOKEN: ${{ secrets.MERCADOPAGO_ACCESS_TOKEN }}
-
-      - name: E2E tests skipped (no secrets)
-        if: vars.MERCADOPAGO_ACCESS_TOKEN == ''
-        run: echo "Skipping E2E tests - MERCADOPAGO_ACCESS_TOKEN not set"
 
       - uses: actions/upload-artifact@v4
         if: always()

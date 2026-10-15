@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000" role="img" aria-label="CL-SIL-090 Silla de comedor Quiroga, color Haya">
+  <!-- Pieza de catálogo NOMAHOME — dibujo del taller, no fotografía -->
+  <rect width="800" height="1000" fill="#d8cfc2"/>
+
+  <g stroke="#1c1712" stroke-width="1.5" opacity="0.65">
+    <path d="M26 56 v-30 h30"/>
+    <path d="M774 56 v-30 h-30"/>
+    <path d="M26 944 v30 h30"/>
+    <path d="M774 944 v30 h-30"/>
+  </g>
+  <rect x="44" y="44" width="712" height="912" fill="none" stroke="rgba(28, 23, 18, 0.14)"/>
+
+  <text x="64" y="96" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="19" letter-spacing="4" fill="#4a433c">NOMAHOME · MORELIA</text>
+  <text x="736" y="96" text-anchor="end" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="19" letter-spacing="4" fill="#4a433c">PIEZA DE CATÁLOGO</text>
+
+  <g transform="translate(0, -20)">
+    
+  <line x1="140" y1="760" x2="660" y2="760" stroke="#1c1712" stroke-width="2" opacity="0.55"/>
+  <rect x="330" y="240" width="140" height="300" fill="none" stroke="#1c1712" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <line x1="365" y1="244" x2="365" y2="536" stroke="#1c1712" stroke-width="3"/>
+  <line x1="400" y1="244" x2="400" y2="536" stroke="#1c1712" stroke-width="3"/>
+  <line x1="435" y1="244" x2="435" y2="536" stroke="#1c1712" stroke-width="3"/>
+  <rect x="330" y="240" width="140" height="40" fill="#c9a887" opacity="0.9"/>
+  <rect x="296" y="540" width="208" height="26" rx="4" fill="#c9a887" stroke="#1c1712" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M310 566 L280 760" stroke="#1c1712" stroke-width="7" fill="none"/>
+  <path d="M490 566 L520 760" stroke="#1c1712" stroke-width="7" fill="none"/>
+  <path d="M330 566 L320 700" stroke="#1c1712" stroke-width="4" fill="none" opacity="0.6"/>
+  <path d="M470 566 L480 700" stroke="#1c1712" stroke-width="4" fill="none" opacity="0.6"/>
+  <path d="M292 690 h228" stroke="#1c1712" stroke-width="4"/>
+  <path d="M400 540 v-260" stroke="#1c1712" stroke-width="2" opacity="0.35"/>
+  </g>
+
+  <line x1="64" y1="884" x2="736" y2="884" stroke="rgba(28, 23, 18, 0.14)" stroke-width="2"/>
+  <text x="64" y="920" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="28" font-weight="600" letter-spacing="6" fill="#1c1712">CL-SIL-090</text>
+  <text x="64" y="944" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="17" letter-spacing="2" fill="#4a433c">SILLA DE COMEDOR QUIROGA</text>
+
+  <rect x="596" y="926" width="22" height="22" rx="2" fill="#c9a887" stroke="#1c1712" stroke-width="1.5"/>
+  <text x="630" y="944" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="17" letter-spacing="2" fill="#4a433c">HAYA</text>
+</svg>

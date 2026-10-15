@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000" role="img" aria-label="CL-PUR-330 Purificador de aire para sala, color Hueso">
+  <!-- Pieza de catálogo NOMAHOME — dibujo del taller, no fotografía -->
+  <rect width="800" height="1000" fill="#e7e0d4"/>
+
+  <g stroke="#1c1712" stroke-width="1.5" opacity="0.65">
+    <path d="M26 56 v-30 h30"/>
+    <path d="M774 56 v-30 h-30"/>
+    <path d="M26 944 v30 h30"/>
+    <path d="M774 944 v30 h-30"/>
+  </g>
+  <rect x="44" y="44" width="712" height="912" fill="none" stroke="rgba(28, 23, 18, 0.14)"/>
+
+  <text x="64" y="96" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="19" letter-spacing="4" fill="#4a433c">NOMAHOME · MORELIA</text>
+  <text x="736" y="96" text-anchor="end" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="19" letter-spacing="4" fill="#4a433c">PIEZA DE CATÁLOGO</text>
+
+  <g transform="translate(0, -20)">
+    
+  <line x1="220" y1="800" x2="580" y2="800" stroke="#1c1712" stroke-width="2" opacity="0.55"/>
+  <rect x="320" y="330" width="160" height="400" rx="32" fill="#ede6d8" stroke="#1c1712" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <g stroke="#1c1712" stroke-width="3" opacity="0.55">
+    <line x1="352" y1="378" x2="448" y2="378"/>
+    <line x1="344" y1="398" x2="456" y2="398"/>
+    <line x1="352" y1="418" x2="448" y2="418"/>
+  </g>
+  <circle cx="400" cy="560" r="16" fill="none" stroke="#8d6840" stroke-width="3"/>
+  <path d="M400 560 v-36" stroke="#8d6840" stroke-width="3"/>
+  <path d="M500 360 q60 -10 96 24" fill="none" stroke="#1c1712" stroke-width="3" opacity="0.5"/>
+  <path d="M504 420 q80 -8 132 30" fill="none" stroke="#1c1712" stroke-width="3" opacity="0.35"/>
+  <path d="M506 480 q100 -4 168 36" fill="none" stroke="#1c1712" stroke-width="3" opacity="0.2"/>
+  <path d="M340 730 L332 800 M460 730 L468 800" stroke="#1c1712" stroke-width="5" fill="none"/>
+  <path d="M290 290 q110 -36 220 0" fill="none" stroke="#c4a27a" stroke-width="2.5" opacity="0.8"/>
+  </g>
+
+  <line x1="64" y1="884" x2="736" y2="884" stroke="rgba(28, 23, 18, 0.14)" stroke-width="2"/>
+  <text x="64" y="920" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="28" font-weight="600" letter-spacing="6" fill="#1c1712">CL-PUR-330</text>
+  <text x="64" y="944" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="17" letter-spacing="2" fill="#4a433c">PURIFICADOR DE AIRE PARA SALA</text>
+
+  <rect x="596" y="926" width="22" height="22" rx="2" fill="#ede6d8" stroke="#1c1712" stroke-width="1.5"/>
+  <text x="630" y="944" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="17" letter-spacing="2" fill="#4a433c">HUESO</text>
+</svg>

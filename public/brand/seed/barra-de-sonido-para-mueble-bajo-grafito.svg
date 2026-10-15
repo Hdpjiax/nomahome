@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000" role="img" aria-label="CL-BDS-310 Barra de sonido para mueble bajo, color Grafito">
+  <!-- Pieza de catálogo NOMAHOME — dibujo del taller, no fotografía -->
+  <rect width="800" height="1000" fill="#e7e0d4"/>
+
+  <g stroke="#1c1712" stroke-width="1.5" opacity="0.65">
+    <path d="M26 56 v-30 h30"/>
+    <path d="M774 56 v-30 h-30"/>
+    <path d="M26 944 v30 h30"/>
+    <path d="M774 944 v30 h-30"/>
+  </g>
+  <rect x="44" y="44" width="712" height="912" fill="none" stroke="rgba(28, 23, 18, 0.14)"/>
+
+  <text x="64" y="96" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="19" letter-spacing="4" fill="#4a433c">NOMAHOME · MORELIA</text>
+  <text x="736" y="96" text-anchor="end" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="19" letter-spacing="4" fill="#4a433c">PIEZA DE CATÁLOGO</text>
+
+  <g transform="translate(0, -20)">
+    
+  <line x1="120" y1="760" x2="680" y2="760" stroke="#1c1712" stroke-width="2" opacity="0.55"/>
+  <rect x="170" y="600" width="460" height="130" fill="none" stroke="#1c1712" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M200 730 L192 760 M600 730 L608 760" stroke="#1c1712" stroke-width="6" fill="none"/>
+  <line x1="170" y1="640" x2="630" y2="640" stroke="#1c1712" stroke-width="1.5" opacity="0.4"/>
+  <rect x="120" y="512" width="560" height="72" rx="36" fill="#3a3733" stroke="#1c1712" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <g opacity="0.45" stroke="#f3eee6" stroke-width="3">
+    <circle cx="172" cy="548" r="4" fill="none"/><circle cx="208" cy="548" r="4" fill="none"/><circle cx="244" cy="548" r="4" fill="none"/><circle cx="280" cy="548" r="4" fill="none"/><circle cx="316" cy="548" r="4" fill="none"/><circle cx="352" cy="548" r="4" fill="none"/><circle cx="388" cy="548" r="4" fill="none"/><circle cx="424" cy="548" r="4" fill="none"/><circle cx="460" cy="548" r="4" fill="none"/><circle cx="496" cy="548" r="4" fill="none"/><circle cx="532" cy="548" r="4" fill="none"/><circle cx="568" cy="548" r="4" fill="none"/><circle cx="604" cy="548" r="4" fill="none"/><circle cx="640" cy="548" r="4" fill="none"/>
+  </g>
+  <circle cx="632" cy="548" r="6" fill="#c4a27a"/>
+  <path d="M330 470 q70 -26 140 0" fill="none" stroke="#c4a27a" stroke-width="3"/>
+  <path d="M356 440 q44 -16 88 0" fill="none" stroke="#c4a27a" stroke-width="2" opacity="0.6"/>
+  </g>
+
+  <line x1="64" y1="884" x2="736" y2="884" stroke="rgba(28, 23, 18, 0.14)" stroke-width="2"/>
+  <text x="64" y="920" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="28" font-weight="600" letter-spacing="6" fill="#1c1712">CL-BDS-310</text>
+  <text x="64" y="944" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="17" letter-spacing="2" fill="#4a433c">BARRA DE SONIDO PARA MUEBLE BAJO</text>
+
+  <rect x="596" y="926" width="22" height="22" rx="2" fill="#3a3733" stroke="#1c1712" stroke-width="1.5"/>
+  <text x="630" y="944" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="17" letter-spacing="2" fill="#4a433c">GRAFITO</text>
+</svg>

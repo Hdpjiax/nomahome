@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000" role="img" aria-label="CL-BOC-205 Bocina de estantería Cuitzeo, color Hueso">
+  <!-- Pieza de catálogo NOMAHOME — dibujo del taller, no fotografía -->
+  <rect width="800" height="1000" fill="#d8cfc2"/>
+
+  <g stroke="#1c1712" stroke-width="1.5" opacity="0.65">
+    <path d="M26 56 v-30 h30"/>
+    <path d="M774 56 v-30 h-30"/>
+    <path d="M26 944 v30 h30"/>
+    <path d="M774 944 v30 h-30"/>
+  </g>
+  <rect x="44" y="44" width="712" height="912" fill="none" stroke="rgba(28, 23, 18, 0.14)"/>
+
+  <text x="64" y="96" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="19" letter-spacing="4" fill="#4a433c">NOMAHOME · MORELIA</text>
+  <text x="736" y="96" text-anchor="end" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="19" letter-spacing="4" fill="#4a433c">PIEZA DE CATÁLOGO</text>
+
+  <g transform="translate(0, -20)">
+    
+  <line x1="220" y1="800" x2="580" y2="800" stroke="#1c1712" stroke-width="2" opacity="0.55"/>
+  <rect x="310" y="290" width="180" height="440" rx="14" fill="#ede6d8" stroke="#1c1712" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="400" cy="420" r="62" fill="none" stroke="#1c1712" stroke-width="4"/>
+  <circle cx="400" cy="420" r="24" fill="#c4a27a" stroke="#1c1712" stroke-width="3"/>
+  <circle cx="400" cy="560" r="40" fill="none" stroke="#1c1712" stroke-width="3.5"/>
+  <circle cx="400" cy="560" r="14" fill="#8d6840" stroke="#1c1712" stroke-width="2"/>
+  <rect x="366" y="672" width="68" height="10" rx="5" fill="#1c1712" opacity="0.35"/>
+  <path d="M330 730 L318 800 M470 730 L482 800" stroke="#1c1712" stroke-width="6" fill="none"/>
+  <path d="M290 250 q110 -40 220 0" fill="none" stroke="#c4a27a" stroke-width="2.5" opacity="0.8"/>
+  </g>
+
+  <line x1="64" y1="884" x2="736" y2="884" stroke="rgba(28, 23, 18, 0.14)" stroke-width="2"/>
+  <text x="64" y="920" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="28" font-weight="600" letter-spacing="6" fill="#1c1712">CL-BOC-205</text>
+  <text x="64" y="944" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="17" letter-spacing="2" fill="#4a433c">BOCINA DE ESTANTERÍA CUITZEO</text>
+
+  <rect x="596" y="926" width="22" height="22" rx="2" fill="#ede6d8" stroke="#1c1712" stroke-width="1.5"/>
+  <text x="630" y="944" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="17" letter-spacing="2" fill="#4a433c">HUESO</text>
+</svg>

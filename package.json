@@ -14,8 +14,9 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "db:types": "supabase gen types typescript --project-id $PROJECT_ID > types/supabase.ts",
-    "db:lint": "supabase db lint"
+    "db:types": "supabase gen types typescript --local > lib/supabase/database.types.ts",
+    "db:lint": "node scripts/db-lint.mjs",
+    "seed:svgs": "node scripts/generate-seed-svg.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

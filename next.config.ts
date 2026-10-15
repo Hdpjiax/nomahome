@@ -13,14 +13,19 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     const isProduction = process.env.NODE_ENV === "production";
+    // Next en modo dev necesita unsafe-eval para React Refresh; en producción
+    // no lo necesita nadie: no hay SDK de terceros, el checkout es nuestro.
+    const scriptSrc = isProduction
+      ? "script-src 'self' 'unsafe-inline'"
+      : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://sdk.mercadopago.com https://*.mercadopago.com",
-      "style-src 'self' 'unsafe-inline' https://*.mercadopago.com",
+      scriptSrc,
+      "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "font-src 'self' data:",
-      "frame-src 'self' https://*.mercadopago.com",
-      "connect-src 'self' https://*.mercadopago.com https://*.supabase.co",
+      "frame-src 'self'",
+      "connect-src 'self' https://*.supabase.co",
     ];
 
     return [

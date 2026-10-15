@@ -18,7 +18,7 @@ Use these when working on their domains:
 
 - [`diseno-original`](.agents/skills/diseno-original/SKILL.md) — UI, layout, motion, design system, home, product card, cart, admin
 - [`catalogo-producto`](.agents/skills/catalogo-producto/SKILL.md) — Products, variants, colors, photos, categories, quick add, search, reviews
-- [`checkout-mercadopago`](.agents/skills/checkout-mercadopago/SKILL.md) — Cart, checkout, Payment Brick, webhooks, order states, payments ledger
+- [`checkout`](.claude/skills/checkout/SKILL.md) — Carrito, checkout, cobro por SPEI, confirmación de pagos, webhooks, estados de pedido, ledger
 - [`facturacion-cfdi`](.agents/skills/facturacion-cfdi/SKILL.md) — Billing, CFDI 4.0, Facturapi, invoices
 - [`admin-catalogo`](.agents/skills/admin-catalogo/SKILL.md) — Admin panel, products, photos, categories, orders, payments, invoices, reviews
 - [`auditoria-seguridad`](.agents/skills/auditoria-seguridad/SKILL.md) — Typecheck, lint, tests, build, secrets, RLS, webhooks, headers, Lighthouse, axe
