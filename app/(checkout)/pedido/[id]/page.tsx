@@ -7,6 +7,8 @@ import { getGuestOrderTokens } from '@/lib/checkout/guest-access';
 import { isSandbox } from '@/lib/payments/signature';
 import PageFade from '@/components/motion/PageFade';
 import SimulatePaymentButton from './SimulatePaymentButton';
+import ReviewForm from '@/components/store/ReviewForm';
+import { getMyReviewsForOrder } from '@/lib/reviews/actions';
 import { formatMXN } from '@/lib/money';
 import { waLink, waOrder } from '@/lib/whatsapp';
 
@@ -67,6 +69,11 @@ export default async function OrderPage({ params }: PageProps) {
     postal_code: string;
     phone: string;
   };
+
+  const myReviews =
+    user && order.user_id === user.id && order.status === 'paid'
+      ? await getMyReviewsForOrder(order.id)
+      : [];
 
   const clabe = process.env.NEXT_PUBLIC_STORE_CLABE ?? '';
   const bank = process.env.NEXT_PUBLIC_STORE_BANK ?? '';
@@ -220,6 +227,52 @@ export default async function OrderPage({ params }: PageProps) {
               )}
             </section>
           )}
+
+          {/* Reseñas de compra verificada: solo el dueño con sesión,
+              con el pedido pagado (§8 reseñas). */}
+          {order.status === 'paid' && user && order.user_id === user.id ? (
+            <section className="col-span-12 border-t border-[var(--line)] pt-[var(--space-5)]" aria-labelledby="resenas-h">
+              <h2 id="resenas-h" className="font-display text-2xl mb-[var(--space-3)]">
+                ¿Ya la tienes en casa?
+              </h2>
+              <p className="text-sm text-[var(--ink-soft)] max-w-xl mb-[var(--space-4)] leading-relaxed">
+                Escribe cómo te va con cada pieza. Solo se publican reseñas de
+                compras verificadas: esta compra.
+              </p>
+              <div className="grid grid-cols-12 gap-[var(--space-4)]">
+                {(items ?? []).map((raw) => {
+                  const item = raw as { id: string; variant_id: string; name_snapshot: string; sku_snapshot: string };
+                  const mine = myReviews.find((r) => r.variant_id === item.variant_id);
+                  return (
+                    <div key={item.id} className="col-span-12 md:col-span-6">
+                      {mine ? (
+                        <div className="border border-[var(--line)] rounded-[var(--radius-m)] p-[var(--space-4)]">
+                          <p className="text-catalog mb-[var(--space-2)]">{item.sku_snapshot}</p>
+                          <p className="font-mono text-xs text-[var(--brass)] mb-[var(--space-2)]">
+                            {'★'.repeat(mine.rating)}
+                            <span className="text-[var(--line)]">{'★'.repeat(5 - mine.rating)}</span>
+                          </p>
+                          <p className="text-xs text-[var(--ink-soft)]">
+                            {mine.status === 'pending'
+                              ? 'En revisión del taller. Aparece cuando se publique.'
+                              : mine.status === 'published'
+                                ? 'Publicada en la ficha de la pieza.'
+                                : 'El taller no publicó esta reseña.'}
+                          </p>
+                        </div>
+                      ) : (
+                        <ReviewForm
+                          variantId={item.variant_id}
+                          orderId={order.id}
+                          variantLabel={item.sku_snapshot}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
         </div>
 
         <div className="mt-[var(--space-7)] pt-[var(--space-5)] border-t border-[var(--line)] flex flex-wrap gap-[var(--space-5)]">
