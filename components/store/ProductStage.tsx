@@ -16,7 +16,13 @@ import { waLink } from '@/lib/whatsapp';
  * stock real del taller, medidas, cantidad, carrito o aviso por WhatsApp.
  * Sin stock 0 no hay checkout (§8): botón Avisar al taller.
  */
-export default function ProductStage({ piece }: { piece: CatalogPiece }) {
+export default function ProductStage({
+  piece,
+  favorited = false,
+}: {
+  piece: CatalogPiece;
+  favorited?: boolean;
+}) {
   const router = useRouter();
   const reduce = useReducedMotion();
   const [variantId, setVariantId] = useState(() => {
@@ -26,6 +32,23 @@ export default function ProductStage({ piece }: { piece: CatalogPiece }) {
   const [qty, setQty] = useState(1);
   const [state, setState] = useState<CartActionState>({ status: 'idle' });
   const [pending, startTransition] = useTransition();
+  const [saved, setSaved] = useState(favorited);
+  const [savedNote, setSavedNote] = useState<string | null>(null);
+  const [savedPending, startSaved] = useTransition();
+
+  function toggleSaved() {
+    startSaved(async () => {
+      const { toggleFavoriteAction } = await import('@/lib/account/actions');
+      const result = await toggleFavoriteAction(piece.id);
+      if (result.ok) {
+        setSaved(result.favorited);
+        setSavedNote(null);
+        router.refresh();
+      } else {
+        setSavedNote(result.error);
+      }
+    });
+  }
 
   const variant = piece.variants.find((v) => v.id === variantId) ?? piece.variants[0];
   const out = !variant || variant.stock <= 0;
@@ -216,12 +239,29 @@ export default function ProductStage({ piece }: { piece: CatalogPiece }) {
           </>
         )}
 
-        <Link
-          href={`/producto/${piece.slug}/agregar`}
-          className="font-mono text-sm underline underline-offset-4 decoration-[var(--brass)] w-fit"
-        >
-          Elegir rápido
-        </Link>
+        <div className="flex flex-wrap items-center gap-[var(--space-4)]">
+          <Link
+            href={`/producto/${piece.slug}/agregar`}
+            className="font-mono text-sm underline underline-offset-4 decoration-[var(--brass)]"
+          >
+            Elegir rápido
+          </Link>
+          <button
+            type="button"
+            onClick={toggleSaved}
+            disabled={savedPending}
+            className={`font-mono text-sm underline underline-offset-4 decoration-[var(--brass)] ${
+              saved ? 'text-[var(--brass)]' : ''
+            }`}
+            aria-pressed={saved}
+          >
+            {saved ? 'Guardada' : 'Guardar pieza'}
+          </button>
+        </div>
+
+        <p aria-live="polite" className="min-h-5 text-xs">
+          {savedNote ? <span className="text-[var(--danger)]">{savedNote}</span> : null}
+        </p>
 
         <p aria-live="polite" className="min-h-5 text-xs">
           {state.status === 'ok' ? (

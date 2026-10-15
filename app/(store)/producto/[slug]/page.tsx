@@ -13,10 +13,26 @@ import PieceCard from '@/components/store/PieceCard';
 import PageFade from '@/components/motion/PageFade';
 import { formatMXN, shippingCents } from '@/lib/money';
 import { waLink, waQuestion } from '@/lib/whatsapp';
+import { getSessionUser } from '@/lib/auth/session';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
 type PageProps = { params: Promise<{ slug: string }> };
+
+/** ¿La pieza está guardada en favoritos del usuario actual? */
+async function isFavorited(productId: string): Promise<boolean> {
+  const user = await getSessionUser();
+  if (!user) return false;
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase
+    .from('favorites')
+    .select('product_id')
+    .eq('user_id', user.id)
+    .eq('product_id', productId)
+    .maybeSingle();
+  return Boolean(data);
+}
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -41,10 +57,11 @@ export default async function ProductPage({ params }: PageProps) {
   const piece = await getPieceBySlug(slug);
   if (!piece) notFound();
 
-  const [tabs, reviews, related] = await Promise.all([
+  const [tabs, reviews, related, favorited] = await Promise.all([
     getProductTabs(piece.id),
     getProductReviews(piece.id),
     getRelatedPieces(piece),
+    isFavorited(piece.id),
   ]);
 
   const prices = piece.variants.map((v) => v.priceCents);
@@ -89,7 +106,7 @@ export default async function ProductPage({ params }: PageProps) {
           <span>{piece.name}</span>
         </nav>
 
-        <ProductStage piece={piece} />
+        <ProductStage piece={piece} favorited={favorited} />
 
         {piece.description ? (
           <section className="mt-[var(--space-7)] max-w-2xl">
