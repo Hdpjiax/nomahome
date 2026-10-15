@@ -65,7 +65,7 @@ export default async function ProductPage({ params }: PageProps) {
   ]);
 
   const prices = piece.variants.map((v) => v.priceCents);
-  const jsonLd = {
+  const jsonLd: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: piece.name,
@@ -86,6 +86,16 @@ export default async function ProductPage({ params }: PageProps) {
         : 'https://schema.org/OutOfStock',
     },
   };
+
+  // aggregateRating solo con reseñas publicadas: sin reseñas inventadas (§8).
+  if (reviews.length > 0) {
+    const avg = reviews.reduce((n, r) => n + r.rating, 0) / reviews.length;
+    jsonLd.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: Math.round(avg * 10) / 10,
+      reviewCount: reviews.length,
+    };
+  }
 
   const shipping = shippingCents(piece.priceCents, 'Michoacán');
 
