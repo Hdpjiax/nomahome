@@ -863,6 +863,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      decrement_variant_stock: {
+        Args: { p_qty: number; p_variant_id: string };
+        Returns: undefined;
+      };
       is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
     };
     Enums: {
