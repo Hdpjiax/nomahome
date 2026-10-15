@@ -1,8 +1,12 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getSessionUser } from '@/lib/auth/session';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { AccountNav } from '../../layout';
 import PageFade from '@/components/motion/PageFade';
+import InvoiceRequestForm from './InvoiceRequestForm';
+import { CFDI_USES, TAX_REGIMES, isFacturapiConfigured } from '@/lib/invoicing/facturapi';
+import { formatMXN } from '@/lib/money';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,14 +16,29 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-/**
- * La captura de datos fiscales (RFC, régimen, uso de CFDI con los
- * catálogos vigentes) y el timbrado CFDI 4.0 llegan con la fase de
- * facturación. Aquí solo decimos la verdad del estado actual.
- */
+const STATUS_LABEL: Record<string, string> = {
+  requested: 'Solicitada · timbrado pendiente',
+  stamped: 'Timbrada',
+  canceled: 'Cancelada',
+};
+
+/** Facturación (§8 cuenta): CFDI 4.0 solo de pedidos pagados. */
 export default async function BillingPage() {
   const user = await getSessionUser();
   if (!user) redirect('/cuenta');
+
+  const supabase = await createSupabaseServerClient();
+  const [{ data: orders }, { data: invoices }] = await Promise.all([
+    supabase
+      .from('orders')
+      .select('id, public_ref, total_cents, status, created_at')
+      .in('status', ['paid', 'fulfilled'])
+      .order('created_at', { ascending: false }),
+    supabase.from('invoices').select('*'),
+  ]);
+
+  const invoiceByOrder = new Map((invoices ?? []).map((i) => [i.order_id, i]));
+  const configured = isFacturapiConfigured();
 
   return (
     <PageFade>
@@ -31,17 +50,68 @@ export default async function BillingPage() {
 
         <AccountNav active="facturacion" />
 
-        <div className="border-t border-b border-[var(--line)] py-[var(--space-7)] max-w-2xl">
-          <h2 className="font-display text-2xl mb-[var(--space-3)]">
-            La factura se pide cuando el pedido está pagado.
-          </h2>
-          <p className="text-sm text-[var(--ink-soft)] leading-relaxed">
-            Cuando un pedido tuyo pase a pagado, aquí capturas tus datos
-            fiscales (RFC, razón social, régimen y uso de CFDI) y pides la
-            factura CFDI 4.0 timbrada. El timbrado llega del SAT vía nuestro
-            emisor autorizado: no hay facturas caseras.
-          </p>
-        </div>
+        <p className="mb-[var(--space-5)] text-sm text-[var(--ink-soft)] max-w-xl leading-relaxed">
+          La factura CFDI 4.0 se pide con el pedido pagado, una sola vez,
+          salvo cancelación. El timbrado lo hace Facturapi, emisor autorizado
+          del SAT: aquí no hay XML caseros.
+        </p>
+
+        {(orders ?? []).length === 0 ? (
+          <div className="border-t border-b border-[var(--line)] py-[var(--space-7)]">
+            <h2 className="font-display text-2xl mb-[var(--space-3)]">
+              Todavía sin pedidos pagados.
+            </h2>
+            <p className="text-sm text-[var(--ink-soft)] max-w-lg leading-relaxed">
+              Cuando un pedido tuyo pase a pagado, pides su factura aquí con
+              tus datos fiscales.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-12 gap-[var(--space-5)]">
+            {(orders ?? []).map((o) => {
+              const invoice = invoiceByOrder.get(o.id);
+              return (
+                <div key={o.id} className="col-span-12 md:col-span-6">
+                  <div className="flex items-baseline justify-between gap-[var(--space-3)] mb-[var(--space-2)]">
+                    <p className="font-display text-lg">{o.public_ref}</p>
+                    <p className="font-mono text-sm">{formatMXN(o.total_cents)}</p>
+                  </div>
+                  {invoice ? (
+                    <div className="border border-[var(--line)] rounded-[var(--radius-m)] p-[var(--space-4)]">
+                      <p className="font-mono text-xs mb-2">
+                        RFC {invoice.rfc}
+                      </p>
+                      <p
+                        className={`font-mono text-[11px] uppercase tracking-[0.08em] ${
+                          invoice.status === 'stamped'
+                            ? 'text-[var(--ok)]'
+                            : invoice.status === 'canceled'
+                              ? 'text-[var(--danger)]'
+                              : 'text-[var(--ink-soft)]'
+                        }`}
+                      >
+                        {STATUS_LABEL[invoice.status] ?? invoice.status}
+                      </p>
+                      {invoice.uuid ? (
+                        <p className="mt-2 font-mono text-[11px] text-[var(--ink-soft)] break-all">
+                          UUID {invoice.uuid}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <InvoiceRequestForm
+                      orderId={o.id}
+                      folio={o.public_ref ?? 'Pedido'}
+                      uses={CFDI_USES}
+                      regimes={TAX_REGIMES}
+                      configured={configured}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </PageFade>
   );

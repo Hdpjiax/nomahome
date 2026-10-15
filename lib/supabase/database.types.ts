@@ -310,6 +310,7 @@ export type Database = {
           order_id: string;
           pdf_url: string | null;
           postal_code: string;
+          provider_invoice_id: string | null;
           rfc: string;
           status: string;
           tax_regime: string;
@@ -327,6 +328,7 @@ export type Database = {
           order_id: string;
           pdf_url?: string | null;
           postal_code: string;
+          provider_invoice_id?: string | null;
           rfc: string;
           status?: string;
           tax_regime: string;
@@ -343,6 +345,7 @@ export type Database = {
           order_id?: string;
           pdf_url?: string | null;
           postal_code?: string;
+          provider_invoice_id?: string | null;
           rfc?: string;
           status?: string;
           tax_regime?: string;
