@@ -2,12 +2,12 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 /**
- * Middleware de sesión Supabase (patrón oficial @supabase/ssr):
+ * Middleware de sesión Supabase (patrón oficial @supabase/ssr (Next 16: convención proxy)):
  * refresca el token en cada request escribiendo las cookies en la
  * respuesta. No autoriza nada aquí: las páginas deciden con getUser()
  * en el servidor; el admin se verifica con profiles.role (fase 7).
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(

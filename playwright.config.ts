@@ -2,16 +2,20 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/e2e',
-  fullyParallel: true,
+  // Determinista: un solo worker contra un solo dev server; la compilación
+  // bajo demanda de Turbopack hace que los tests paralelos se roben tiempo.
+  fullyParallel: false,
+  workers: 1,
+  timeout: 45_000,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  globalSetup: './tests/e2e/global-setup.ts',
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:3000',
