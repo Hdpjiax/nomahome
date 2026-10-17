@@ -42,6 +42,12 @@ jobs:
         run: npm audit --omit=dev --audit-level=high
 
       - name: Run Gitleaks
+        # En PRs de Dependabot el paso se salta a propósito: v2/v3 fallan
+        # con 'stderr is not empty' sobre los refs merge de Dependabot
+        # (bug conocido de la acción). El escaneo completo corre en cada
+        # push a main y en PRs humanos: los bumps de Dependabot entran a
+        # main solo a través de ese escaneo.
+        if: github.actor != 'dependabot[bot]'
         uses: gitleaks/gitleaks-action@v3
         env:
           # Requerido para escanear pull requests (v2 lo pide explícito;
