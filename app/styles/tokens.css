@@ -1,5 +1,5 @@
 :root {
-  /* Colors */
+  /* Colors — Lumen Editorial Luxury Palette */
   --ink: #1c1712;
   --ink-soft: #4a433c;
   --paper: #f3eee6;
@@ -10,13 +10,16 @@
   --clay: #9c4630;
   --pine: #243f34;
   --line: rgba(28, 23, 18, 0.14);
+  --line-strong: rgba(28, 23, 18, 0.28);
   --danger: #8e2f24;
   --ok: #2d5a45;
 
   /* Effects */
   --shadow: 0 24px 60px rgba(28, 23, 18, 0.08);
+  --shadow-luxury: 0 32px 80px rgba(28, 23, 18, 0.14);
+  --glow-brass: 0 0 0 1px rgba(196, 162, 122, 0.45), 0 20px 50px rgba(28, 23, 18, 0.12);
 
-  /* Spacing & Radius */
+  /* Spacing & Radius (strictly <= 6px per architectural system) */
   --radius-s: 2px;
   --radius-m: 6px;
   --space-1: 4px;
@@ -36,9 +39,9 @@
   --slow: 720ms;
 
   /* Typography */
-  --font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", serif;
-  --font-ui: "Schibsted Grotesk", "Avenir Next", "Segoe UI", sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-display: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', serif;
+  --font-ui: 'Schibsted Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 }
 
 /* Ensure reduced motion respect across all elements */
@@ -55,12 +58,49 @@ body {
   background-color: var(--paper);
   color: var(--ink);
   font-family: var(--font-ui);
+  overflow-x: hidden;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-display);
 }
 
-code, pre {
+code,
+pre {
   font-family: var(--font-mono);
+}
+
+@keyframes lumen-marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes lumen-pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(196, 162, 122, 0.65);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(196, 162, 122, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(196, 162, 122, 0);
+  }
+}
+
+@keyframes lumen-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }

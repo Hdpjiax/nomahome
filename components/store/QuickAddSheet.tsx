@@ -6,7 +6,8 @@ import QuickAdd from './QuickAdd';
 import type { CatalogPiece } from '@/lib/catalog/types';
 
 /**
- * Botón "Agregar" de los listados: abre el sheet con el QuickAdd (§8).
+ * Botón "Agregar" de los listados: abre el sheet con el QuickAdd (§8)
+ * con estética cálida en travertino y bronce cepillado.
  */
 export default function QuickAddSheet({ piece }: { piece: CatalogPiece }) {
   const [open, setOpen] = useState(false);

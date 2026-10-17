@@ -1,20 +1,25 @@
 'use client';
 
 import { useMemo, useState, useTransition } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { addToCartAction, type CartActionState } from '@/lib/cart/actions';
 import { lineTotal, orderTotal, formatMXN } from '@/lib/money';
 import type { CatalogPiece, CatalogVariant } from '@/lib/catalog/types';
+import LuxuryImage from './LuxuryImage';
 import { waLink } from '@/lib/whatsapp';
 
 /**
- * Agregado rápido (§8): foto, color, cantidad, precio y envío estimado.
- * Confirmar escribe cart_items (server action con service role) y muestra
- * el mini-estado del carrito. Sin stock: Avisar al taller por WhatsApp.
+ * Agregado rápido (§8): foto real, color, cantidad, precio y envío estimado.
+ * Confirmar escribe cart_items y muestra el mini-estado del carrito.
  */
-export default function QuickAdd({ piece, onClose }: { piece: CatalogPiece; onClose?: () => void }) {
+export default function QuickAdd({
+  piece,
+  onClose,
+}: {
+  piece: CatalogPiece;
+  onClose?: () => void;
+}) {
   const router = useRouter();
   const [variantId, setVariantId] = useState(() => {
     const withStock = piece.variants.find((v) => v.stock > 0);
@@ -48,20 +53,25 @@ export default function QuickAdd({ piece, onClose }: { piece: CatalogPiece; onCl
     <div className="flex flex-col gap-[var(--space-5)]">
       <div className="flex gap-[var(--space-4)]">
         {media ? (
-          <Image
+          <LuxuryImage
             src={media.path}
+            productSlug={piece.slug}
+            colorName={variant?.color.name}
             alt={media.alt || piece.name}
-            width={media.width ?? 240}
-            height={media.height ?? 300}
-            className="w-24 h-30 object-cover rounded-[var(--radius-m)] bg-[var(--paper-2)]"
+            className="w-24 h-30 object-cover rounded-[var(--radius-m)] bg-[var(--paper-2)] border border-[var(--line)]"
           />
         ) : null}
         <div className="flex-1">
           <p className="text-catalog mb-1">{piece.sku}</p>
-          <Link href={`/producto/${piece.slug}`} className="font-display text-lg leading-tight hover:underline underline-offset-4 decoration-[var(--brass)]">
+          <Link
+            href={`/producto/${piece.slug}`}
+            className="font-display text-lg leading-tight hover:underline underline-offset-4 decoration-[var(--brass)]"
+          >
             {piece.name}
           </Link>
-          <p className="mt-1 text-xs text-[var(--ink-soft)]">{variant?.material ?? piece.materials[0]}</p>
+          <p className="mt-1 text-xs text-[var(--ink-soft)]">
+            {variant?.material ?? piece.materials[0]}
+          </p>
           <p className="mt-1 font-mono text-sm font-semibold">{formatMXN(unit)}</p>
         </div>
       </div>
@@ -151,7 +161,9 @@ export default function QuickAdd({ piece, onClose }: { piece: CatalogPiece; onCl
       {/* Acciones */}
       {out ? (
         <a
-          href={waLink(`Hola NOMAHOME. Me interesa la pieza ${piece.name} (${piece.sku}) y quiero saber cuándo hay en taller.`)}
+          href={waLink(
+            `Hola NOMAHOME. Me interesa la pieza ${piece.name} (${piece.sku}) y quiero saber cuándo hay en taller.`
+          )}
           target="_blank"
           rel="noopener noreferrer"
           className="btn-primary text-center"
@@ -168,7 +180,11 @@ export default function QuickAdd({ piece, onClose }: { piece: CatalogPiece; onCl
         {state.status === 'ok' ? (
           <span className="text-[var(--ok)]">
             En el carrito.{' '}
-            <Link href="/carrito" className="underline underline-offset-4 decoration-[var(--brass)]" onClick={onClose}>
+            <Link
+              href="/carrito"
+              className="underline underline-offset-4 decoration-[var(--brass)]"
+              onClick={onClose}
+            >
               Ver el carrito ({state.cartCount})
             </Link>
           </span>

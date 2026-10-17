@@ -1,4 +1,4 @@
-# Casa Lumen — Rules & Skills
+# Casa Lumen / NOMAHOME — Rules & Skills (Luxury Edition)
 
 ## Hard Rules
 
@@ -9,7 +9,8 @@
 - Never disable RLS, use service role in client components, or trust roles in localStorage only.
 - No `any`, `@ts-ignore`, prices calculated only in browser.
 - No Inter, Roboto, Geist, Arial, zinc cards, purple gradients, particle heroes, icon systems, or shadcn/ui defaults.
-- No Unsplash/Pexels/repeat placeholders as final design. Seed uses custom SVG from repo. Admin uploads real photos.
+- All product variants pair verified high-resolution editorial photography (`lib/catalog/photo-registry.ts`) with local architectural studio renders (`public/brand/photos/*.jpg` and `public/brand/seed/*.svg`) via `<LuxuryImage>`.
+- Keep all border radii `<= 6px` (`--radius-s: 2px`, `--radius-m: 6px`) and preserve left-aligned Fraunces `h1` headings and 64px fixed header.
 - No made-up endpoints. Payment and CFDI follow official docs.
 
 ## Skills
@@ -26,8 +27,8 @@ Use these when working on their domains:
 ## Stack
 
 - **Framework**: Next.js 16+ (App Router, TypeScript strict)
-- **Styling**: Tailwind CSS 4 with custom tokens
-- **Backend**: Supabase (Postgres, Auth, Storage, RLS)
+- **Styling**: Tailwind CSS 4 with custom tokens (`Lumen Editorial Luxury`)
+- **Backend**: Supabase (Postgres, Auth, Storage, RLS) + seamless local fallback catalog (`lib/catalog/fallback-catalog.ts`)
 - **Payment**: Own SPEI checkout (incoming bank transfer to the workshop CLABE, no card capture on server)
 - **Invoicing**: Facturapi CFDI 4.0 (no fake PDFs)
 - **Deploy**: Vercel + Supabase

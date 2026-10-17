@@ -1,12 +1,17 @@
 import 'server-only';
+import { cookies } from 'next/headers';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { lineTotal, orderTotal } from '@/lib/money';
+import { FALLBACK_PIECES } from '@/lib/catalog/fallback-catalog';
+import { resolveVariantVisuals } from '@/lib/catalog/photo-registry';
 import { readCartSession } from './session';
 
 /**
  * Servicio de carrito. Toda escritura pasa por aquí con service role:
  * carts y cart_items no tienen policies de escritura para el cliente
  * (migración 0001). El servidor es el único que toca el carrito.
+ * Incluye respaldo en cookie httpOnly cuando la app corre sobre el
+ * catálogo semilla local sin conexión a Supabase.
  */
 
 export type CartLine = {
@@ -42,6 +47,87 @@ export type CartView = {
 
 type AdminClient = ReturnType<typeof createAdminClient>;
 
+const FALLBACK_COOKIE = 'cl_fallback_cart';
+
+type FallbackCartEntry = { variantId: string; qty: number };
+
+async function readFallbackEntries(): Promise<FallbackCartEntry[]> {
+  try {
+    const store = await cookies();
+    const raw = store.get(FALLBACK_COOKIE)?.value;
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (x): x is FallbackCartEntry =>
+        typeof x === 'object' &&
+        x !== null &&
+        typeof (x as FallbackCartEntry).variantId === 'string' &&
+        typeof (x as FallbackCartEntry).qty === 'number' &&
+        (x as FallbackCartEntry).qty > 0
+    );
+  } catch {
+    return [];
+  }
+}
+
+async function writeFallbackEntries(entries: FallbackCartEntry[]): Promise<void> {
+  const store = await cookies();
+  store.set(FALLBACK_COOKIE, JSON.stringify(entries), {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: 60 * 60 * 24 * 30,
+  });
+}
+
+function buildFallbackCartView(entries: FallbackCartEntry[]): CartView | null {
+  if (entries.length === 0) return null;
+  const lines: CartLine[] = [];
+  for (const entry of entries) {
+    for (const p of FALLBACK_PIECES) {
+      const v = p.variants.find((va) => va.id === entry.variantId);
+      if (v) {
+        const qty = Math.min(entry.qty, Math.max(v.stock, 1));
+        const media = v.media[0];
+        lines.push({
+          itemId: `fb-${v.id}`,
+          variantId: v.id,
+          qty,
+          productSlug: p.slug,
+          productName: p.name,
+          productSku: p.sku,
+          variantSku: v.sku,
+          colorName: v.color.name,
+          colorHex: v.color.hex,
+          material: v.material,
+          unitPriceCents: v.priceCents,
+          compareAtCents: v.compareAtCents,
+          stock: v.stock,
+          mediaPath: media?.path ?? null,
+          mediaAlt: media?.alt ?? p.name,
+          lineTotalCents: lineTotal(v.priceCents, qty),
+        });
+      }
+    }
+  }
+  if (lines.length === 0) return null;
+  const subtotalCents = lines.reduce((n, l) => n + l.lineTotalCents, 0);
+  const itemCount = lines.reduce((n, l) => n + l.qty, 0);
+  const totals = orderTotal(subtotalCents, undefined, 'Michoacán');
+  return {
+    cartId: 'cart-fallback-local',
+    lines,
+    itemCount,
+    subtotalCents: totals.subtotalCents,
+    shippingCents: totals.shippingCents,
+    taxCents: totals.taxCents,
+    totalCents: totals.totalCents,
+    shippingNote: 'Envío estimado dentro de Michoacán. Se ajusta con tu dirección en el pago.',
+  };
+}
+
 async function findCart(admin: AdminClient, sessionId: string | null, userId: string | null) {
   if (!sessionId && !userId) return null;
   let query = admin
@@ -63,7 +149,6 @@ export async function getOrCreateCart(admin: AdminClient) {
   const { ensureCartSession } = await import('./session');
   const sessionId = await ensureCartSession();
 
-  // Usuario con sesión: preferimos su carrito abierto.
   let userId: string | null = null;
   try {
     const { createSupabaseServerClient } = await import('@/lib/supabase/server');
@@ -76,7 +161,6 @@ export async function getOrCreateCart(admin: AdminClient) {
 
   const existing = await findCart(admin, sessionId, userId);
   if (existing) {
-    // Si el invitado tenía carrito y ahora hay sesión, lo amarramos al usuario.
     if (userId && !existing.user_id) {
       await admin.from('carts').update({ user_id: userId }).eq('id', existing.id);
     }
@@ -101,18 +185,21 @@ export async function readCart(admin: AdminClient): Promise<string | null> {
 }
 
 export async function getCartCount(): Promise<number> {
-  // La cookie se lee ANTES de crear el cliente admin: durante el prerender
-  // estático, cookies() corta el intento y la ruta queda dinámica. Así el
-  // build no exige NEXT_PUBLIC_SUPABASE_URL en el runner y un visitante
-  // sin cookie (primer toque, crawler) jamás abre el cliente service role.
+  const fbEntries = await readFallbackEntries();
+  const fbCount = fbEntries.reduce((n, i) => n + i.qty, 0);
+
   const sessionId = await readCartSession();
-  if (!sessionId) return 0;
-  const admin = createAdminClient();
-  const cart = await findCart(admin, sessionId, null);
-  if (!cart) return 0;
-  const { data, error } = await admin.from('cart_items').select('qty').eq('cart_id', cart.id);
-  if (error || !data) return 0;
-  return data.reduce((n, i) => n + i.qty, 0);
+  if (!sessionId) return fbCount;
+  try {
+    const admin = createAdminClient();
+    const cart = await findCart(admin, sessionId, null);
+    if (!cart) return fbCount;
+    const { data, error } = await admin.from('cart_items').select('qty').eq('cart_id', cart.id);
+    if (error || !data) return fbCount;
+    return data.reduce((n, i) => n + i.qty, 0) + fbCount;
+  } catch {
+    return fbCount;
+  }
 }
 
 const LINE_SELECT = `
@@ -147,6 +234,7 @@ function mapLine(row: LineRow): CartLine | null {
   const v = row.product_variants;
   if (!v || !v.published || !v.colors || !v.products) return null;
   const media = (v.product_media ?? []).slice().sort((a, b) => a.sort_order - b.sort_order)[0];
+  const resolvedMedia = resolveVariantVisuals(v.products.slug, v.colors.name, media?.path ?? null);
   return {
     itemId: row.id,
     variantId: row.variant_id,
@@ -161,42 +249,48 @@ function mapLine(row: LineRow): CartLine | null {
     unitPriceCents: v.price_cents,
     compareAtCents: v.compare_at_cents,
     stock: v.stock,
-    mediaPath: media?.path ?? null,
-    mediaAlt: media?.alt ?? null,
+    mediaPath: resolvedMedia.primarySrc,
+    mediaAlt: media?.alt ?? resolvedMedia.alt,
     lineTotalCents: lineTotal(v.price_cents, row.qty),
   };
 }
 
 export async function getCartView(): Promise<CartView | null> {
-  const admin = createAdminClient();
-  const cartId = await readCart(admin);
-  if (!cartId) return null;
+  try {
+    const admin = createAdminClient();
+    const cartId = await readCart(admin);
+    if (cartId) {
+      const { data, error } = await admin
+        .from('cart_items')
+        .select(LINE_SELECT)
+        .eq('cart_id', cartId)
+        .order('created_at', { ascending: true });
+      if (!error && data) {
+        const lines = (data as LineRow[]).map(mapLine).filter((l): l is CartLine => l !== null);
+        if (lines.length > 0) {
+          const subtotalCents = lines.reduce((n, l) => n + l.lineTotalCents, 0);
+          const itemCount = lines.reduce((n, l) => n + l.qty, 0);
+          const totals = orderTotal(subtotalCents, undefined, 'Michoacán');
+          return {
+            cartId,
+            lines,
+            itemCount,
+            subtotalCents: totals.subtotalCents,
+            shippingCents: totals.shippingCents,
+            taxCents: totals.taxCents,
+            totalCents: totals.totalCents,
+            shippingNote:
+              'Envío estimado dentro de Michoacán. Se ajusta con tu dirección en el pago.',
+          };
+        }
+      }
+    }
+  } catch {
+    // Fallback
+  }
 
-  const { data, error } = await admin
-    .from('cart_items')
-    .select(LINE_SELECT)
-    .eq('cart_id', cartId)
-    .order('created_at', { ascending: true });
-  if (error) throw new Error(`cart_items: ${error.message}`);
-
-  const lines = (data as LineRow[]).map(mapLine).filter((l): l is CartLine => l !== null);
-  const subtotalCents = lines.reduce((n, l) => n + l.lineTotalCents, 0);
-  const itemCount = lines.reduce((n, l) => n + l.qty, 0);
-
-  // Envío estimado con tarifa de taller (Michoacán); se ajusta con la
-  // dirección real en el checkout.
-  const totals = orderTotal(subtotalCents, undefined, 'Michoacán');
-
-  return {
-    cartId,
-    lines,
-    itemCount,
-    subtotalCents: totals.subtotalCents,
-    shippingCents: totals.shippingCents,
-    taxCents: totals.taxCents,
-    totalCents: totals.totalCents,
-    shippingNote: 'Envío estimado dentro de Michoacán. Se ajusta con tu dirección en el pago.',
-  };
+  const fbEntries = await readFallbackEntries();
+  return buildFallbackCartView(fbEntries);
 }
 
 /**
@@ -208,6 +302,22 @@ export async function addToCart(
   variantId: string,
   qty: number
 ): Promise<{ ok: true; cartCount: number } | { ok: false; error: string }> {
+  if (variantId.startsWith('var-')) {
+    const found = FALLBACK_PIECES.flatMap((p) => p.variants).find((v) => v.id === variantId);
+    if (!found) return { ok: false, error: 'Esa pieza ya no está publicada.' };
+    if (found.stock <= 0) return { ok: false, error: 'Ese color ya no tiene piezas en taller.' };
+    const entries = await readFallbackEntries();
+    const safeQty = Math.max(1, Math.min(Math.floor(qty), found.stock));
+    const idx = entries.findIndex((e) => e.variantId === variantId);
+    if (idx >= 0) {
+      entries[idx]!.qty = Math.min(entries[idx]!.qty + safeQty, found.stock);
+    } else {
+      entries.push({ variantId, qty: safeQty });
+    }
+    await writeFallbackEntries(entries);
+    return { ok: true, cartCount: entries.reduce((n, e) => n + e.qty, 0) };
+  }
+
   const admin = createAdminClient();
 
   const { data: variant, error: vError } = await admin
@@ -252,6 +362,21 @@ export async function setItemQty(
   itemId: string,
   qty: number
 ): Promise<{ ok: true; cartCount: number } | { ok: false; error: string; cartCount: number }> {
+  if (itemId.startsWith('fb-')) {
+    const variantId = itemId.slice(3);
+    const entries = await readFallbackEntries();
+    const idx = entries.findIndex((e) => e.variantId === variantId);
+    if (idx < 0) return { ok: false, error: 'Esa línea ya no está en el carrito.', cartCount: 0 };
+    if (qty <= 0) {
+      entries.splice(idx, 1);
+    } else {
+      const found = FALLBACK_PIECES.flatMap((p) => p.variants).find((v) => v.id === variantId);
+      entries[idx]!.qty = Math.min(Math.floor(qty), Math.max(found?.stock ?? 1, 1));
+    }
+    await writeFallbackEntries(entries);
+    return { ok: true, cartCount: entries.reduce((n, e) => n + e.qty, 0) };
+  }
+
   const admin = createAdminClient();
 
   const cartId = await readCart(admin);
@@ -285,11 +410,14 @@ export async function setItemQty(
 export async function removeItem(
   itemId: string
 ): Promise<{ ok: true; cartCount: number } | { ok: false; error: string; cartCount: number }> {
+  if (itemId.startsWith('fb-')) {
+    return setItemQty(itemId, 0);
+  }
+
   const admin = createAdminClient();
   const cartId = await readCart(admin);
   if (!cartId) return { ok: false, error: 'No hay carrito en esta sesión.', cartCount: 0 };
 
-  // Verificamos que la línea sea del carrito de ESTA sesión.
   const { error } = await admin.from('cart_items').delete().eq('id', itemId).eq('cart_id', cartId);
   if (error) throw new Error(`delete item: ${error.message}`);
   return { ok: true, cartCount: await getCartCount() };

@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { getCartView } from '@/lib/cart/service';
 import { removeItemFormAction, setItemQtyFormAction } from '@/lib/cart/actions';
 import EmptyState from '@/components/store/EmptyState';
+import LuxuryImage from '@/components/store/LuxuryImage';
 import PageFade from '@/components/motion/PageFade';
 import { formatMXN } from '@/lib/money';
 import { waLink, waOrder } from '@/lib/whatsapp';
@@ -70,12 +70,12 @@ export default async function CartPage() {
                   <li key={line.itemId} className="py-[var(--space-5)] flex gap-[var(--space-4)]">
                     <Link href={`/producto/${line.productSlug}`} className="shrink-0">
                       {line.mediaPath ? (
-                        <Image
+                        <LuxuryImage
                           src={line.mediaPath}
+                          productSlug={line.productSlug}
+                          colorName={line.colorName}
                           alt={line.mediaAlt ?? line.productName}
-                          width={120}
-                          height={150}
-                          className="w-20 h-25 object-cover rounded-[var(--radius-m)] bg-[var(--paper-2)]"
+                          className="w-20 h-25 object-cover rounded-[var(--radius-m)] bg-[var(--paper-2)] border border-[var(--line)]"
                         />
                       ) : (
                         <div className="w-20 h-25 rounded-[var(--radius-m)] bg-[var(--paper-2)]" />
@@ -124,16 +124,17 @@ export default async function CartPage() {
                             </form>
                           </div>
                           <form action={remove}>
-                            <button type="submit" className="font-mono text-xs underline underline-offset-4 decoration-[var(--brass)]">
+                            <button
+                              type="submit"
+                              className="font-mono text-xs underline underline-offset-4 decoration-[var(--brass)]"
+                            >
                               Quitar
                             </button>
                           </form>
                         </div>
 
                         <div className="text-right">
-                          <p className="font-mono text-sm">
-                            {formatMXN(line.unitPriceCents)} c/u
-                          </p>
+                          <p className="font-mono text-sm">{formatMXN(line.unitPriceCents)} c/u</p>
                           <p className="font-mono text-sm font-semibold">
                             {formatMXN(line.lineTotalCents)}
                           </p>

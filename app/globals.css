@@ -1,16 +1,29 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @layer base {
-  /* Remove default margins and paddings */
   * {
     @apply m-0 p-0;
   }
 
-  html, body {
-    @apply w-full h-full;
+  html,
+  body {
+    @apply w-full min-h-full;
+    scroll-behavior: smooth;
   }
 
-  /* Typography defaults */
+  body {
+    background-color: var(--paper);
+    background-image:
+      radial-gradient(ellipse at 78% 12%, rgba(196, 162, 122, 0.22), transparent 58%),
+      radial-gradient(ellipse at 14% 62%, rgba(141, 104, 64, 0.1), transparent 55%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background-color: var(--brass);
+    color: var(--paper);
+  }
+
   h1 {
     font-family: var(--font-display);
     @apply text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold tracking-tight leading-none;
@@ -26,21 +39,30 @@
     @apply text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight;
   }
 
-  h4, h5, h6 {
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-display);
     @apply font-semibold leading-snug;
   }
 
-  body, button, input, select, textarea {
+  body,
+  button,
+  input,
+  select,
+  textarea {
     font-family: var(--font-ui);
   }
 
-  code, pre {
+  code,
+  pre {
     font-family: var(--font-mono);
   }
 
-  /* Form elements */
-  button, input, select, textarea {
+  button,
+  input,
+  select,
+  textarea {
     @apply outline-none;
   }
 
@@ -48,7 +70,9 @@
     @apply cursor-pointer;
   }
 
-  input, textarea, select {
+  input,
+  textarea,
+  select {
     @apply rounded-[var(--radius-m)];
   }
 }
@@ -60,17 +84,57 @@
 
   .text-catalog {
     font-family: var(--font-mono);
-    @apply text-xs uppercase tracking-[0.08em] text-[var(--ink-soft)];
+    @apply text-xs uppercase tracking-[0.08em] text-[var(--brass)];
   }
 
+  /* Botón primario de alta ebanistería: fondo tinta cálida con filete interior de latón cepillado */
   .btn-primary {
-    @apply px-[var(--space-4)] py-[var(--space-3)] rounded-[var(--radius-m)] font-medium transition-colors;
-    @apply bg-[var(--ink)] text-[var(--paper)] hover:bg-[var(--ink-soft)];
+    @apply inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-[var(--radius-m)] font-medium tracking-[0.04em] transition-all duration-[420ms] ease-[var(--ease)];
+    background-color: rgb(28, 23, 18);
+    color: var(--paper);
+    box-shadow:
+      inset 0 0 0 1px rgba(196, 162, 122, 0.58),
+      0 14px 34px -8px rgba(28, 23, 18, 0.28);
   }
 
+  .btn-primary:hover {
+    background-color: #2b221a;
+    transform: translateY(-1.5px);
+    box-shadow:
+      inset 0 0 0 1px rgba(196, 162, 122, 0.88),
+      0 20px 42px -8px rgba(28, 23, 18, 0.36);
+  }
+
+  /* Botón secundario cálido en travertino y bronce cepillado */
   .btn-secondary {
-    @apply px-[var(--space-4)] py-[var(--space-3)] rounded-[var(--radius-m)] font-medium transition-colors;
-    @apply bg-[var(--paper)] text-[var(--ink)] border border-[var(--line)] hover:bg-[var(--paper-2)];
+    @apply inline-flex items-center justify-center gap-2.5 px-5 py-3.5 rounded-[var(--radius-m)] font-medium tracking-[0.03em] transition-all duration-[420ms] ease-[var(--ease)];
+    background: linear-gradient(
+      180deg,
+      rgba(248, 244, 236, 0.92) 0%,
+      rgba(235, 226, 212, 0.92) 100%
+    );
+    color: var(--ink);
+    border: 1px solid rgba(141, 104, 64, 0.48);
+    box-shadow: 0 8px 22px -10px rgba(48, 34, 20, 0.14);
+  }
+
+  .btn-secondary:hover {
+    background: var(--brass);
+    color: var(--paper);
+    border-color: var(--brass);
+    transform: translateY(-1px);
+  }
+
+  .btn-brass {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 rounded-[var(--radius-m)] font-medium tracking-[0.04em] transition-all duration-[420ms] ease-[var(--ease)];
+    background: linear-gradient(135deg, #8d6840 0%, #a67d50 100%);
+    color: var(--paper);
+    box-shadow: 0 12px 28px -8px rgba(141, 104, 64, 0.38);
+  }
+
+  .btn-brass:hover {
+    background: var(--ink);
+    color: var(--paper);
   }
 
   .btn-disabled {
@@ -79,6 +143,20 @@
 
   .line-separator {
     @apply border-b border-[var(--line)];
+  }
+
+  .luxury-surface {
+    background: linear-gradient(
+      155deg,
+      rgba(248, 244, 236, 0.92) 0%,
+      rgba(233, 224, 210, 0.88) 100%
+    );
+    border: 1px solid rgba(141, 104, 64, 0.24);
+    box-shadow: 0 24px 60px -18px rgba(42, 30, 18, 0.12);
+  }
+
+  .hotspot-pulse {
+    animation: lumen-pulse-ring 2.4s infinite cubic-bezier(0.22, 1, 0.36, 1);
   }
 }
 

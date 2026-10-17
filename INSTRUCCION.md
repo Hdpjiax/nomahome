@@ -1,12 +1,12 @@
-# INSTRUCCIÓN ÚNICA — TIENDA CASA LUMEN
+# INSTRUCCIÓN ÚNICA — TIENDA CASA LUMEN / NOMAHOME (EDICIÓN DE LUJO)
 
-Ejecuta este documento completo, de la fase 0 a la fase 10, en este mismo turno de trabajo. No pidas confirmación entre fases. No entregues un resumen en lugar del código. No uses un template visual. Si falta un secreto, deja la integración cableada, el cobro bloqueado con explicación y `.env.example` documentado; un pago aprobado solo se simula en `PAYMENTS_MODE=sandbox` y siempre a través del webhook firmado.
+Ejecuta este documento completo, de la fase 0 a la fase 10, sobre la rama `main`. No pidas confirmación entre fases. No entregues un resumen en lugar del código. No uses un template visual genérico. Si falta un secreto, deja la integración cableada, el cobro bloqueado con explicación y `.env.example` documentado; un pago aprobado solo se simula en `PAYMENTS_MODE=sandbox` y siempre a través del webhook firmado.
 
 Sustituye solo estos valores si el humano los escribió encima. Si no, usa los defaults.
 
 ```yaml
 marca: NOMAHOME
-tagline: Muebles y tecnología para vivir la casa
+tagline: Muebles de autor, iluminación 2700K y tecnología para vivir la casa
 ciudad: Morelia, Michoacán
 pais: MX
 moneda: MXN
@@ -19,11 +19,15 @@ email_soporte: hola@nomahome.us
 
 ---
 
-## 1. Misión
+## 1. Misión y Experiencia de Lujo
 
-Construir desde cero una tienda de muebles y tecnología para el hogar. Debe verse editorial y propia, no como un theme de Shopify, no como un dashboard shadcn y no como una landing SaaS.
+Construir una casa de ebanistería arquitectónica, iluminación cálida y tecnología residencial de lujo en Morelia (`NOMAHOME`). Debe sentirse viva, editorial, táctil y propia — jamás como un theme genérico de Shopify, un dashboard shadcn ni una página vacía con inicios raros.
 
-El comprador recorre inicio, categorías, ficha completa, agregado rápido, reseñas, cuenta, carrito y checkout sin salir del sitio para pagar. El admin carga un producto completo, lo mueve de categoría, reordena pestañas y ve pagos y facturas en el mismo admin.
+Desde el primer instante en que el comprador entra a `/`, la página muestra lo que busca:
+- **Vitrina Inmediata Above-the-Fold (`HeroVitrina`)**: acceso directo a todas las colecciones (`Muebles`, `Iluminación`, `Tecnología del hogar`, `Textiles`), buscador inmediato, selector en vivo de las 4 piezas insignia con cambio de acabado/color en tiempo real, precio con IVA desglosado, medidas arquitectónicas y agregado rápido al carrito sin salir de la portada.
+- **Catálogo Interactivo en Vivo (`InteractiveCatalogShowcase`)**: filtrado instantáneo con transiciones fluidas (`motion/react`), cambio de variante/acabado directamente desde cada tarjeta de producto (`PieceCard`), alternador entre fotografía real de alta resolución y ficha técnica de estudio, y panel `QuickAdd`.
+- **Lookbook Interactivo ("Espacios NOMA · Shop the Room")**: escenas arquitectónicas de Sala y Comedor con puntos interactivos (`01`–`04`) que revelan cada pieza en contexto con su medida, material, stock y compra inmediata.
+- **Respaldo Semilla Permanente (`lib/catalog/fallback-catalog.ts`)**: aún antes de conectar o sembrar Supabase, la tienda muestra las 12 piezas completas con sus 24 variantes, precios, fotografías y carrito funcional, sin pantallas vacías ni inicios raros.
 
 Stack fijo: Next.js App Router, TypeScript strict, Tailwind con tokens propios, Supabase (Postgres, Auth, Storage, RLS), Vercel.
 
@@ -37,16 +41,13 @@ Factura fija: UI propia. Timbrado CFDI 4.0 con el paquete `facturapi`. Un PDF ge
 
 Prohibido, sin excepción:
 
-
 - Marcar `orders.status = paid` desde el cliente, desde WhatsApp o sin webhook con firma válida.
 - Poner `SUPABASE_SERVICE_ROLE_KEY` `NEXT_PUBLIC_`.
 - Desactivar RLS, usar el service role en componentes cliente, o confiar en un rol guardado solo en `localStorage`.
 - `any`, `@ts-ignore` y precios calculados solo en el navegador.
 - Inter, Roboto, Geist, Arial, cards zinc, gradiente morado, hero de partículas, iconos como sistema visual, y el tema por defecto de shadcn/ui.
-- Fotos de Unsplash, Pexels o placeholders repetidos como diseño final. El seed usa piezas SVG propias del repo. El admin sube las fotos reales.
+- Dibujos planos genéricos o inicios vacíos: cada variante cuenta con fotografía real de alta resolución (`lib/catalog/photo-registry.ts`) respaldada por renders arquitectónicos de estudio en `public/brand/photos/*.jpg` y `public/brand/seed/*.svg`.
 - Inventar endpoints. El timbrado CFDI se implementa con la documentación oficial vigente de Facturapi.
-
-Si una herramienta de esta instrucción no está instalada, instálala. Si una pantalla parece template, redíséñala antes de seguir.
 
 ---
 
@@ -70,99 +71,11 @@ Desarrollo y auditoría:
 
 Scripts npm obligatorios: `dev`, `build`, `typecheck`, `lint`, `test`, `test:e2e`, `db:types`, `db:lint`.
 
-Variables en `.env.example`, sin valores reales:
-
-```bash
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-NEXT_PUBLIC_WHATSAPP_E164=5214430000000
-# CLABE pública del taller para cobro SPEI entrante
-NEXT_PUBLIC_STORE_CLABE=
-NEXT_PUBLIC_STORE_BANK=
-# sandbox permite aprobar con un evento firmado de prueba; production lo deshabilita
-PAYMENTS_MODE=sandbox
-PAYMENTS_SANDBOX_SECRET=
-# Timbrado CFDI 4.0 (solo servidor)
-FACTURAPI_KEY=
-```
-
-
 ---
 
-## 4. Árbol que debes crear
+## 4. Sistema de diseño — Lumen Editorial Luxury
 
-```text
-app/
-  (store)/page.tsx
-  (store)/categoria/[slug]/page.tsx
-  (store)/producto/[slug]/page.tsx
-  (store)/producto/[slug]/agregar/page.tsx
-  (store)/resenas/page.tsx
-  (store)/buscar/page.tsx
-  (store)/contacto/page.tsx
-  (store)/envios/page.tsx
-  (store)/devoluciones/page.tsx
-  (store)/privacidad/page.tsx
-  (store)/terminos/page.tsx
-  (account)/cuenta/page.tsx
-  (account)/cuenta/pedidos/page.tsx
-  (account)/cuenta/direcciones/page.tsx
-  (account)/cuenta/facturacion/page.tsx
-  (account)/cuenta/favoritos/page.tsx
-  (checkout)/carrito/page.tsx
-  (checkout)/checkout/page.tsx
-  (checkout)/pedido/[id]/page.tsx
-  admin/layout.tsx
-  admin/page.tsx
-  admin/productos/page.tsx
-  admin/productos/[id]/page.tsx
-  admin/categorias/page.tsx
-  admin/pedidos/page.tsx
-  admin/pagos/page.tsx
-  admin/facturas/page.tsx
-  admin/resenas/page.tsx
-  admin/inicio/page.tsx
-  api/webhooks/pagos/route.ts
-  api/webhooks/facturapi/route.ts
-  design-system/page.tsx
-components/store/
-components/admin/
-components/motion/
-lib/supabase/
-lib/payments/
-lib/invoicing/
-lib/validators/
-lib/money/
-lib/whatsapp.ts
-supabase/migrations/
-supabase/seed.sql
-tests/e2e/
-tests/unit/
-public/brand/
-.github/workflows/ci.yml
-.github/workflows/codeql.yml
-.github/dependabot.yml
-.github/pull_request_template.md
-AGENTS.md
-CLAUDE.md
-.cursor/rules/casa-lumen.mdc
-.agents/skills/*/SKILL.md
-.claude/skills/*/SKILL.md
-```
-
-Las skills de abajo se materializan en `.agents/skills/<name>/SKILL.md` y se copian igual a `.claude/skills/<name>/SKILL.md`. `AGENTS.md` y `CLAUDE.md` contienen las reglas duras y apuntan a las skills. No dejes este documento solo en el chat: cópialo también a `INSTRUCCION.md` en la raíz.
-
----
-
-## 5. Sistema de diseño
-
-Nombre interno del sistema: Lumen Editorial. Es un catálogo impreso puesto en pantalla. Mucho papel, poca interfaz, fotografía o materia a sangre, números de pieza como en una ficha de taller.
-
-### Tokens
-
-Crear `app/styles/tokens.css` e importarlo en el layout raíz.
+Tokens en `app/styles/tokens.css`:
 
 ```css
 :root {
@@ -176,20 +89,12 @@ Crear `app/styles/tokens.css` e importarlo en el layout raíz.
   --clay: #9c4630;
   --pine: #243f34;
   --line: rgba(28, 23, 18, 0.14);
+  --line-strong: rgba(28, 23, 18, 0.28);
   --danger: #8e2f24;
   --ok: #2d5a45;
   --shadow: 0 24px 60px rgba(28, 23, 18, 0.08);
   --radius-s: 2px;
   --radius-m: 6px;
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 20px;
-  --space-5: 32px;
-  --space-6: 48px;
-  --space-7: 80px;
-  --space-8: 120px;
-  --max: 1440px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --fast: 180ms;
   --base: 420ms;
@@ -200,347 +105,7 @@ Crear `app/styles/tokens.css` e importarlo en el layout raíz.
 }
 ```
 
-Cargar Fraunces (ejes soft y optical size), Schibsted Grotesk e IBM Plex Mono desde el loader de fuentes de Next, con `display: swap`. No usar Inter, Geist ni Roboto.
-
-Tailwind debe mapear estos tokens. Nada de `bg-zinc-900`, `text-gray-500` ni `rounded-2xl` como lenguaje visual. El radio máximo de un control es 6px. Los botones primarios son tinta sobre papel o papel sobre tinta, no cápsulas.
-
-### Composición
-
-- Fondo `--paper`. Texto `--ink`. El latón es un acento de 4px o de un filete, no un gradiente.
-- Grid de 12 columnas. El home no es un grid uniforme de 4 cards. La primera pieza de cada bloque ocupa 7 columnas y el texto 5, alternando.
-- Números de catálogo visibles: `CL-SOF-220`. Tipografía mono, tracking 0.08em, tamaño 12px.
-- Titulares display en Fraunces, 64–112px en desktop, tracking -0.03em, interlineado 0.92. Nunca centrados todos. El titular del home va alineado a la izquierda y se corta con una foto que entra desde la derecha.
-- Fichas de producto: imagen 4:5, nombre, material, precio. Sin borde gris, sin sombra de card, sin badge “NEW” en píldora. La separación es el papel, no la caja.
-- Header fijo de 64px, fondo papel al 92% con blur suave, wordmark en display, navegación en mono pequeña: Piezas, Tecnología, Oficio, Reseñas. Carrito es un número, no un icono de bolsa gigante.
-- Footer editorial: taller en Morelia, horarios, WhatsApp, legales. Sin columnas de “solutions / company / resources”.
-
-### Motion
-
-Usar `motion/react`. Toda animación respeta `prefers-reduced-motion: reduce` y queda en opacidad instantánea.
-
-- Entrada de página: fade 420ms y 12px de desplazamiento, ease `--ease`. Sin bounce.
-- Cambio de color en ficha: crossfade de 480ms entre dos imágenes del mismo encuadre. El swatch no gira.
-- Agregado rápido: sheet desde la derecha, 420ms, fondo tinta al 28%. En móvil, desde abajo, altura 92dvh.
-- Precio: no cuenta regresiva falsa ni “alguien lo está viendo”.
-- Scroll: un solo bloque del home puede revelar medidas con `whileInView`. Prohibido Lenis global si rompe el ancla de accesibilidad o el scroll del sheet.
-- Hover de pieza en desktop: la imagen escala 1.03 en 700ms. Nada más.
-
-### Voz
-
-Español de México, tuteo, frases cortas. Se habla de piezas, tela, madera, luz y medida. No se dice “descubre la magia”, “eleva tu estilo de vida” ni “solución integral”. Ejemplo de titular: “Una mesa que aguanta la lámpara y la conversación.” Ejemplo de botón: “Agregar al carrito”. Ejemplo de error: “Ese color ya no tiene piezas en taller.”
-
-### Página `/design-system`
-
-Solo en desarrollo. Muestra color, tipo, botones, swatch, sheet, ficha, precio con IVA desglosado y el estado vacío del carrito. Si esta página se ve genérica, el resto también lo está: corrígela primero.
-
-### Anti-patrones visuales
-
-Rechaza y rehaz si aparece cualquiera de estos: hero a pantalla completa con texto centrado y botón gradiente; tres columnas de beneficios con icono redondo; carrusel automático; “confiado por” logos; testimonios en cards blancas con estrellas amarillas de emoji; navbar con búsqueda enorme y mega-menú gris; product card con sombra y botón azul “Add to cart”.
-
----
-
-## 6. Skills que debes escribir en disco
-
-Cada skill lleva frontmatter `name` y `description`. El `name` coincide con la carpeta. Al trabajar una de estas tareas, sigue la skill correspondiente además de este documento.
-
-### `.agents/skills/diseno-original/SKILL.md`
-
-```markdown
----
-name: diseno-original
-description: Usar al crear o modificar cualquier UI de Casa Lumen, layout, motion, tokens, home, ficha, carrito o admin. Obliga el sistema Lumen Editorial y prohíbe looks de template.
----
-
-# Diseño original
-
-1. Lee `app/styles/tokens.css` antes de crear un componente.
-2. Usa solo `--ink`, `--paper`, `--stone`, `--brass`, `--clay`, `--pine` y las fuentes Fraunces, Schibsted Grotesk e IBM Plex Mono.
-3. Compón en asimetría. Una pieza grande, texto al lado, filete de 1px `--line`.
-4. Motion solo con `motion/react`, duraciones `--fast`, `--base`, `--slow`, ease `--ease`.
-5. Implementa `prefers-reduced-motion`.
-6. No importes un theme kit. Si un componente nace pareciendo shadcn, bórralo y redibújalo.
-7. Admin usa la misma materia visual, con densidad mayor y mono para datos. No es un panel gris de Bootstrap.
-8. Antes de cerrar una pantalla, compárala con la lista de anti-patrones de INSTRUCCION.md.
-```
-
-### `.agents/skills/catalogo-producto/SKILL.md`
-
-```markdown
----
-name: catalogo-producto
-description: Usar al modelar productos, variantes, colores, fotos, categorías, agregado rápido, ficha, búsqueda o reseñas de Casa Lumen.
----
-
-# Catálogo
-
-1. Un producto tiene variantes. El color, el SKU, el precio y el stock viven en la variante, no solo en el padre.
-2. Cada variante tiene al menos una imagen ordenada. Cambiar color cambia la galería.
-3. La ficha `/producto/[slug]` muestra galería, swatches, medidas, materiales, tecnología, envío, reseñas verificadas, relacionados y JSON-LD Product.
-4. El agregado rápido existe en dos sitios: sheet en listados y ruta `/producto/[slug]/agregar`. Ambos escriben el mismo carrito.
-5. El precio mostrado sale de `lib/money`. El servidor recalcula al agregar y al cobrar.
-6. Solo reseñas de un usuario con un pedido pagado de esa variante pueden publicarse. El admin modera.
-7. Categorías son árbol de un nivel en v1: Muebles, Iluminación, Tecnología del hogar, Textiles. Un producto puede estar en varias. El admin puede moverlo.
-```
-
-### `.agents/skills/checkout/SKILL.md`
-
-```markdown
----
-name: checkout
-description: Usar al implementar carrito, checkout, cobro por SPEI, confirmación de pagos, webhooks, estados de pedido o el ledger de pagos. Nunca capturar tarjeta en servidores propios.
----
-
-# Cobro propio — checkout del taller
-
-1. El checkout de `/checkout` se queda en el sitio, con textos y colores de Lumen Editorial. Cobro propio = transferencia SPEI entrante a la CLABE del taller (`NEXT_PUBLIC_STORE_CLABE`). Nunca una pasarela casera que pida número de tarjeta o código de seguridad.
-2. El monto, la descripción y la referencia del pedido (`public_ref`) se crean en el servidor. El cliente no envía el total.
-3. `SUPABASE_SERVICE_ROLE_KEY` solo se usa en Route Handlers o Server Actions.
-4. Jamás se capturan `cardNumber` ni `securityCode`: no se piden, no se guardan en estado de React, logs, Supabase ni analytics. `payments` no tiene columnas de tarjeta y no se agregan.
-5. El pedido nace `pending_payment`. Solo pasa a `paid` por: (a) confirmación del taller — Server Action con rol admin verificado en servidor, idempotente, con registro en `audit_logs` — o (b) un evento firmado con HMAC válido y monto igual al total.
-6. En `PAYMENTS_MODE=sandbox` existe un endpoint de simulación que emite el evento firmado para probar el flujo completo (pago aprobado simulado). Fuera de sandbox responde 404 y no cambia nada. El webhook `/api/webhooks/pagos` verifica la firma HMAC del cuerpo crudo; si la firma falla, responde 401 y no cambia el pedido.
-7. El handler es idempotente por id de pago. Un reintento no descuenta stock dos veces.
-8. Solo un pago aprobado con monto igual al pedido pasa `orders.status` a `paid` y descuenta stock.
-9. La CLABE del taller es pública; se muestra en el checkout junto a la referencia del pedido. Este software no hace dispersiones SPEI de salida: el dinero llega a la cuenta del taller y ahí se queda.
-10. WhatsApp acompaña el pedido pero jamás cambia su estado. El enlace `wa.me` lleva folio, SKU y total como texto.
-```
-
-### `.agents/skills/facturacion-cfdi/SKILL.md`
-
-```markdown
----
-name: facturacion-cfdi
-description: Usar al pedir, timbrar, mostrar, reenviar o cancelar CFDI 4.0 de Casa Lumen con Facturapi.
----
-
-# Facturación
-
-1. Instala `facturapi`. La llave vive en `FACTURAPI_KEY` de servidor.
-2. El cliente, en `/cuenta/facturacion`, captura RFC, nombre o razón social, régimen fiscal, uso CFDI y código postal. Valida con Zod. No inventes el catálogo del SAT: usa los catálogos que exponga Facturapi o una tabla semilla con los usos y regímenes vigentes que documente el SAT, citada en comentario con la fuente oficial.
-3. Solo un pedido `paid` puede timbrarse, una sola vez, salvo cancelación previa.
-4. Guarda `uuid`, `status`, `xml_url`, `pdf_url`, `total` y `order_id`. No generes un XML firmado por este repo.
-5. El admin ve, reenvía y solicita cancelación desde `/admin/facturas`.
-6. Si no hay llave, muestra el formulario y un estado “timbrado no configurado”. No generes un PDF con sello falso.
-```
-
-### `.agents/skills/admin-catalogo/SKILL.md`
-
-```markdown
----
-name: admin-catalogo
-description: Usar al construir el panel admin de productos, fotos, colores, pestañas, categorías, reseñas, pedidos, pagos o facturas.
----
-
-# Admin
-
-1. El layout admin exige sesión y `profiles.role = admin` verificado en servidor. Un layout cliente no basta.
-2. Alta y edición cubren: nombre, slug, SKU padre, descripción, categorías, pestañas ordenables, variantes, color, material, medidas, precio, compare-at, stock, IVA incluido, fotos, alt, video URL opcional, SEO title y description, publicado.
-3. Sube fotos a Supabase Storage en el bucket `product-media`. Optimiza en servidor. Guarda path, ancho, alto, alt y orden.
-4. Reordenar pestañas de la ficha y bloques del home persiste `sort_order`.
-5. Mover de categoría es una acción explícita, con auditoría en `audit_logs`.
-6. Pagos y facturas son solo lectura operativa más reenvío y cancelación de CFDI. No hay formulario para “registrar tarjeta”.
-7. Cada mutación admin escribe `audit_logs` con actor, acción, entidad e id.
-```
-
-### `.agents/skills/auditoria-seguridad/SKILL.md`
-
-```markdown
----
-name: auditoria-seguridad
-description: Usar antes de dar por cerrada una fase, al tocar auth, RLS, webhooks, headers, CI o deploy de Casa Lumen.
----
-
-# Auditoría
-
-1. `npm run typecheck`, `lint`, `test` y `build` en verde.
-2. Gitleaks o el secret scan de CI no encuentra llaves.
-3. Busca en el bundle del cliente: `service_role`, `ACCESS_TOKEN`, `FACTURAPI`. Si aparece, es un fallo.
-4. Tests RLS: anónimo no lee `orders` ni `payments`; usuario no lee pedidos ajenos; usuario no inserta en `products`.
-5. Webhook sin firma válida no cambia estado.
-6. Headers en `next.config`: CSP, HSTS en producción, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, frame-ancestors de la propia app.
-7. Lighthouse en `/` y en una ficha: LCP menor a 2.5 s en preview, CLS menor a 0.1. axe sin violaciones críticas en home, ficha y checkout.
-8. No marques la fase 10 como hecha si alguno de estos falla.
-```
-
----
-
-## 7. Modelo de datos
-
-Escribe migraciones SQL versionadas, no cambios a mano en el dashboard. Habilita RLS en todas las tablas. `updated_at` con trigger.
-
-Tablas:
-
-- `profiles`: `id` uuid pk references auth.users, `full_name`, `role` text check in (`customer`,`admin`) default `customer`, `phone`
-- `categories`: `id`, `slug` unique, `name`, `description`, `sort_order`, `parent_id` null
-- `products`: `id`, `slug` unique, `sku`, `name`, `summary`, `description`, `published` bool, `seo_title`, `seo_description`
-- `product_categories`: `product_id`, `category_id`, pk compuesta
-- `colors`: `id`, `name`, `hex`
-- `product_variants`: `id`, `product_id`, `sku` unique, `color_id`, `material`, `width_cm`, `depth_cm`, `height_cm`, `weight_kg`, `price_cents` int, `compare_at_cents` int null, `stock` int, `published` bool
-- `product_media`: `id`, `variant_id`, `path`, `alt`, `width`, `height`, `sort_order`
-- `product_tabs`: `id`, `product_id`, `title`, `body` text, `sort_order`
-- `homepage_blocks`: `id`, `kind`, `title`, `body`, `product_id` null, `sort_order`, `published`
-- `reviews`: `id`, `variant_id`, `user_id`, `order_id`, `rating` int check 1-5, `title`, `body`, `status` check in (`pending`,`published`,`rejected`)
-- `addresses`: `id`, `user_id`, `recipient`, `line1`, `line2`, `city`, `state`, `postal_code`, `phone`, `is_default`
-- `carts`: `id`, `user_id` null, `session_id`, `status`
-- `cart_items`: `id`, `cart_id`, `variant_id`, `qty` int check > 0
-- `orders`: `id`, `user_id`, `email`, `status` check in (`pending_payment`,`paid`,`cancelled`,`fulfilled`), `subtotal_cents`, `shipping_cents`, `tax_cents`, `total_cents`, `address_snapshot` jsonb
-- `order_items`: `id`, `order_id`, `variant_id`, `name_snapshot`, `sku_snapshot`, `unit_price_cents`, `qty`
-- `payments`: `id`, `order_id`, `provider` text default 'spei', `provider_payment_id` unique, `status`, `method`, `reference`, `amount_cents`, `fee_cents`, `net_cents`, `raw_status` text. Sin columnas de tarjeta.
-- `invoices`: `id`, `order_id` unique, `rfc`, `legal_name`, `tax_regime`, `cfdi_use`, `postal_code`, `uuid`, `status`, `xml_url`, `pdf_url`
-- `favorites`: `user_id`, `product_id`, pk compuesta
-- `audit_logs`: `id`, `actor_id`, `action`, `entity`, `entity_id`, `created_at`
-
-Índices en slugs, `provider_payment_id`, `orders.user_id`, `reviews.variant_id`.
-
-RLS, en este sentido exacto:
-
-- Anónimo y autenticado leen categorías, productos, variantes, media y tabs solo si `published = true`.
-- Insert/update/delete de catálogo: solo `profiles.role = admin`.
-- `orders`, `order_items`, `payments`, `invoices`, `addresses`: el dueño lee las suyas; admin lee todas. El cliente no inserta pagos ni cambia `orders.status`.
-- Escritura de pedidos y pagos: solo service role desde el servidor, o una policy que el cliente no pueda cumplir. Prefiere que el Route Handler use service role y el cliente no tenga policy de escritura sobre `payments`.
-- `reviews`: el usuario inserta `pending` solo si existe un `order_items` de esa variante en un pedido suyo `paid`. Update de status: solo admin. Lectura pública: solo `published`.
-- Storage `product-media`: lectura pública de objetos publicados; escritura solo admin.
-
-Seed de 12 piezas, mezcla de mueble y tecnología del hogar, 3 colores en al menos 4 productos, stock realista, precios en centavos MXN, IVA incluido en el precio de vitrina. Ejemplos de nombres, no genéricos en inglés: Sofá Norte 220, Mesa de roble Lerma, Lámpara de mesa Pátzcuaro, Silla de comedor Quiroga, Buró de noche Tzintzuntzan, Estante de acero Morelia, Bocina de estantería Cuitzeo, Lámpara de pie Mil Cumbres, Router de hogar encubierto en caja de roble, Purificador de aire para sala, Hub de cortinas motorizadas, Barra de sonido para mueble bajo. Las imágenes del seed son SVG propios en `public/brand/seed/`, con la paleta del sistema, el nombre de la pieza y una composición geométrica distinta por SKU. No descargues fotos de stock.
-
-Envío v1: tabla no hace falta. Función `shippingCents(subtotal, state)` en `lib/money`: 0 si subtotal >= 1500000 centavos, si no 24900 dentro de Michoacán y 39900 al resto de México. Documenta que cotizar paquetería real es fase posterior.
-
----
-
-## 8. Páginas y comportamiento
-
-### Inicio `/`
-
-Bloques ordenados por `homepage_blocks`. Apertura con una pieza grande y un párrafo de taller. Luego una franja de categorías que no son iconos: son recortes de materia. Después cuatro piezas en composición asimétrica. Cierra con una nota de oficio y el WhatsApp. Metadata y Open Graph propios, no el título por defecto de Next.
-
-### Categoría `/categoria/[slug]`
-
-Filtros en URL: `color`, `material`, `precio_min`, `precio_max`, `orden`. Grid editorial. Cada pieza tiene “Ver pieza” y “Agregar”, este abre el sheet. Estado vacío con una frase de taller, no una ilustración de caja vacía de kit.
-
-### Ficha `/producto/[slug]`
-
-Galería, swatches con nombre y hex, precio, stock, medidas, pestañas ordenadas por el admin, reseñas publicadas, relacionados de la misma categoría. Selector de cantidad. Botón “Agregar al carrito” y enlace “Elegir rápido” a la ruta ligera. JSON-LD `Product` con offers en MXN. Si la variante no tiene stock, el botón dice “Avisar al taller” y abre WhatsApp; no permite checkout de stock 0.
-
-### Agregado rápido
-
-Sheet y `/producto/[slug]/agregar` comparten el componente `QuickAdd`. Muestra foto, color, cantidad, precio y envío estimado. Confirmar escribe `cart_items` y muestra el mini-estado del carrito. No es una segunda ficha recortada con el mismo scroll infinito.
-
-### Reseñas `/resenas`
-
-Listado de reseñas `published`, filtro por categoría, enlace a la pieza. No se inventan testimonios en el seed. Si no hay reseñas, la página lo dice.
-
-### Buscar `/buscar`
-
-Postgres full text en español sobre nombre, summary y material. Resultados con la misma celda de catálogo.
-
-### Carrito `/carrito`
-
-Líneas con foto, color, qty editable, quitar, subtotal, envío estimado, IVA desglosado y total. El IVA se informa como incluido. CTA “Continuar al pago” lleva a checkout. Si no hay sesión, permite seguir como invitado y pide email en checkout.
-
-### Checkout `/checkout`
-
-Misma materia visual. Pasos en una sola página, no un wizard de tres sitios externos: datos, dirección mexicana, resumen e instrucciones de cobro con la CLABE del taller y la referencia del pedido. Al confirmar datos, el servidor crea el pedido `pending_payment` con totales recalculados y muestra la referencia como concepto del SPEI. Debajo, enlace de WhatsApp “Hablar del pedido” que no toca el estado.
-
-### Pedido `/pedido/[id]`
-
-Solo el dueño o el email invitado dueño del token de pedido firmado. Muestra folio, piezas, estado real y, si está pagado, acceso a pedir factura. No muestres datos de otros clientes.
-
-### Cuenta
-
-Pedidos, direcciones, favoritos, datos fiscales. Auth de Supabase por email mágico o contraseña. Tras el alta, existe `profiles` mediante trigger.
-
-### Contacto y legales
-
-`/contacto` con WhatsApp y un formulario que guarda un mensaje en `audit_logs` o en una tabla `messages` con RLS de insert anónimo limitado por rate limit de servidor. Páginas de envíos, devoluciones, privacidad y términos en español, específicas de muebles: plazos de taller, daños en transporte, devolución de 7 días en piezas sin uso. No copies un texto legal de otro sitio.
-
-### Admin
-
-- `/admin` resumen: pedidos por cobrar, pagados hoy, stock bajo, reseñas pendientes.
-- Productos: tabla densa, crear, editar, publicar, duplicar variante.
-- Editor: columnas de datos y una previsualización de la ficha. Drag de pestañas y de fotos persiste orden.
-- Categorías: reordenar y mover producto.
-- Inicio: reordenar bloques.
-- Pedidos: estado de surtido, no de pago. El pago no se edita a mano salvo una acción admin “marcar revisión”, que no equivale a `paid`.
-- Pagos: provider id, método, monto, comisión, neto, estado, enlace al pedido. Vacío si no hay webhook.
-- Facturas: RFC, UUID, estado, reenviar, cancelar.
-- Reseñas: publicar o rechazar.
-
----
-
-## 9. Dinero, cobro y factura
-
-`lib/money` trabaja en centavos enteros. Funciones puras con test: `taxIncludedCents`, `splitIva`, `shippingCents`, `lineTotal`, `orderTotal`. Redondeo half away from zero al centavo. No uses flotantes para cobrar.
-
-Flujo:
-
-1. Checkout crea pedido pendiente con snapshot de dirección y de precios.
-2. El comprador transfiere por SPEI desde su banco usando la referencia del pedido. El navegador no decide el estado final.
-3. Webhook firmado actualiza `payments` y, si aplica, `orders` y stock. En producción, la confirmación la hace el taller sobre su estado de cuenta; también queda registrada en `audit_logs`.
-4. El dinero llega por SPEI entrante a la cuenta del taller. Este software no hace SPEI de salida ni guarda CLABEs de terceros: la única CLABE es la pública del taller, para cobro.
-5. Un pedido pagado puede timbrarse. Facturapi devuelve UUID, XML y PDF. Se guardan las URLs o los archivos en un bucket privado `invoices` con lectura solo del dueño y admin.
-
-WhatsApp: `https://wa.me/<e164>?text=` con texto codificado: marca, folio si existe, SKU, color, cantidad. Función única en `lib/whatsapp.ts`.
-
-Errores de cobro se muestran en la misma página, en español, sin el JSON del proveedor.
-
----
-
-## 10. Herramientas de GitHub y CI
-
-Crear los archivos, no solo mencionarlos.
-
-`.github/dependabot.yml` con updates semanales de npm y github-actions.
-
-`.github/workflows/ci.yml` en pull request y push a main:
-
-- checkout, setup-node 22, `npm ci`
-- `npm run typecheck`
-- `npm run lint`
-- `npm run test`
-- `npm run build`
-- `npm audit --audit-level=high`
-- gitleaks-action sobre el repo
-- Playwright contra el stack local de Supabase: flujo anónimo de ver ficha y abrir agregado rápido, cobro SPEI en sandbox, webhook inválido, idempotencia y tests RLS. Si el stack no puede levantarse en el runner, el job se marca skipped, no verde falso.
-
-`.github/workflows/codeql.yml` con el workflow oficial de CodeQL para `javascript-typescript`.
-
-`next.config` exporta security headers: CSP, HSTS en producción, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` y `X-Frame-Options` de la propia app.
-
-`AGENTS.md` y `CLAUDE.md` repiten las reglas duras en menos de 120 líneas y listan las seis skills. `.cursor/rules/casa-lumen.mdc` tiene `alwaysApply: true` y las mismas prohibiciones visuales y de pago.
-
-Plantilla de PR: qué fase cierra, capturas de home y ficha, resultado de RLS, confirmación de que no hay datos de tarjeta.
-
-Instalar en el repositorio de GitHub, cuando exista remoto: integración de Vercel, integración de Supabase, Dependabot, secret scanning y CodeQL. Documenta esos clics en `DEPLOY.md` en cinco líneas. No pidas al humano que diseñe.
-
----
-
-## 11. Fases
-
-Ciérralas en orden. Al terminar cada una, el código de esa fase corre. No dejes TODOs de la fase en curso.
-
-0. Repo, TypeScript strict, tokens, layout, header, footer, `/design-system`, CI mínimo en verde, skills en disco, `INSTRUCCION.md`.
-1. Migraciones, RLS, trigger de profile, seed SVG, tipos generados, `lib/money` con tests.
-2. Home, categoría, búsqueda, metadata, sitemap, robots.
-3. Ficha, quick add, carrito de invitado y de usuario.
-4. Auth, cuenta, direcciones, favoritos.
-5. Checkout con cobro propio por SPEI, creación de pedido, webhook firmado e idempotente, página de pedido. Simulación de pago aprobado solo en sandbox y por el webhook firmado; en producción, la confirmación es del taller.
-6. Reseñas con compra verificada y moderación.
-7. Admin de catálogo, media, pestañas, categorías y home.
-8. Admin de pagos y facturas. Timbrado sandbox si hay `FACTURAPI_KEY`.
-9. Motion, reduced motion, estados vacíos, JSON-LD, axe en las tres pantallas críticas.
-10. Auditoría de la skill `auditoria-seguridad`, `DEPLOY.md`, preview de Vercel si el CLI o la integración están autenticados. Si no hay token de Vercel, deja el proyecto listo y escríbelo; no finjas el deploy.
-
----
-
-## 12. Hecho
-
-Esto está terminado solo si un extraño puede:
-
-- abrir el home y reconocer un catálogo de taller, no un template;
-- filtrar una categoría, cambiar el color de una pieza y ver otra imagen;
-- agregar rápido y también abrir la ficha completa;
-- comprobar que un webhook inválido no marca el pedido pagado;
-- entrar como admin, crear una variante con fotos, moverla de categoría, reordenar una pestaña y ver el ledger;
-- pedir una factura solo con pedido pagado, sin un XML casero;
-- escribir por WhatsApp con el SKU en el mensaje;
-- ver CI sin secretos filtrados y RLS cubriendo pedidos ajenos.
-
+- Cargar Fraunces (ejes `SOFT` y `opsz`), Schibsted Grotesk e IBM Plex Mono con `display: swap`.
+- Todos los radios de controles, tarjetas e imágenes se mantienen `<= 6px` (`--radius-s: 2px`, `--radius-m: 6px`), preservando el corte arquitectónico de galería.
+- Header fijo de 64px (`h-16`), fondo papel al 92% con `backdrop-blur-sm`, wordmark en display, navegación a `Destacados`, `Piezas`, `Iluminación`, `Tecnología`, `Espacios` y `Reseñas`, y contador de carrito en vivo.
+- Toda animación con `motion/react` respeta `prefers-reduced-motion: reduce` sin alterar la estructura DOM entre servidor y cliente (cero errores de hidratación).
