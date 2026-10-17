@@ -28,6 +28,6 @@ Use these when working on their domains:
 - **Framework**: Next.js 16+ (App Router, TypeScript strict)
 - **Styling**: Tailwind CSS 4 with custom tokens
 - **Backend**: Supabase (Postgres, Auth, Storage, RLS)
-- **Payment**: Mercado Pago (Payment Brick, no card capture on server)
+- **Payment**: Own SPEI checkout (incoming bank transfer to the workshop CLABE, no card capture on server)
 - **Invoicing**: Facturapi CFDI 4.0 (no fake PDFs)
 - **Deploy**: Vercel + Supabase

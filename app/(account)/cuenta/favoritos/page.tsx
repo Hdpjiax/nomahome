@@ -40,19 +40,24 @@ export default async function FavoritesPage() {
 
         {pieces.length === 0 ? (
           <div className="border-t border-b border-[var(--line)] py-[var(--space-7)]">
-            <h2 className="font-display text-2xl mb-[var(--space-3)]">Sin piezas guardadas todavía.</h2>
+            <h2 className="font-display text-2xl mb-[var(--space-3)]">
+              Sin piezas guardadas todavía.
+            </h2>
             <p className="text-sm text-[var(--ink-soft)] max-w-lg leading-relaxed">
-              En la ficha de cada pieza hay un botón para guardarla. Vuelve a
-              ella cuando quieras, sin buscarla otra vez.
+              En la ficha de cada pieza hay un botón para guardarla. Vuelve a ella cuando quieras,
+              sin buscarla otra vez.
             </p>
-            <Link href="/categoria/muebles" className="btn-primary mt-[var(--space-5)] inline-block text-sm">
+            <Link
+              href="/categoria/muebles"
+              className="btn-primary mt-[var(--space-5)] inline-block text-sm"
+            >
               Recorrer el catálogo
             </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-x-[var(--space-5)] gap-y-[var(--space-7)]">
-            {pieces.map((p) => (
-              <PieceCard key={p.id} piece={p} />
+            {pieces.map((p, i) => (
+              <PieceCard key={p.id} piece={p} priority={i === 0} />
             ))}
           </div>
         )}

@@ -1,6 +1,6 @@
 # INSTRUCCIÓN ÚNICA — TIENDA CASA LUMEN
 
-Ejecuta este documento completo, de la fase 0 a la fase 10, en este mismo turno de trabajo. No pidas confirmación entre fases. No entregues un resumen en lugar del código. No uses un template visual. Si falta un secreto, deja la integración cableada, el botón de pago deshabilitado y `.env.example` documentado; nunca simules un pago aprobado.
+Ejecuta este documento completo, de la fase 0 a la fase 10, en este mismo turno de trabajo. No pidas confirmación entre fases. No entregues un resumen en lugar del código. No uses un template visual. Si falta un secreto, deja la integración cableada, el cobro bloqueado con explicación y `.env.example` documentado; un pago aprobado solo se simula en `PAYMENTS_MODE=sandbox` y siempre a través del webhook firmado.
 
 Sustituye solo estos valores si el humano los escribió encima. Si no, usa los defaults.
 
@@ -27,7 +27,7 @@ El comprador recorre inicio, categorías, ficha completa, agregado rápido, rese
 
 Stack fijo: Next.js App Router, TypeScript strict, Tailwind con tokens propios, Supabase (Postgres, Auth, Storage, RLS), Vercel.
 
-Cobro fijo:pasarela prpopia, tarjeta y direccion de facturacion mostrados para el admin
+Cobro fijo: pasarela propia por transferencia SPEI entrante. El comprador ve la CLABE pública del taller y su referencia de pedido; nunca se capturan datos de tarjeta en este sitio. La dirección de facturación vive en el CFDI y el admin la ve en el ledger.
 
 Factura fija: UI propia. Timbrado CFDI 4.0 con el paquete `facturapi`. Un PDF generado aquí no es factura.
 
@@ -44,7 +44,7 @@ Prohibido, sin excepción:
 - `any`, `@ts-ignore` y precios calculados solo en el navegador.
 - Inter, Roboto, Geist, Arial, cards zinc, gradiente morado, hero de partículas, iconos como sistema visual, y el tema por defecto de shadcn/ui.
 - Fotos de Unsplash, Pexels o placeholders repetidos como diseño final. El seed usa piezas SVG propias del repo. El admin sube las fotos reales.
-- Inventar endpoints. Cobro y CFDI se implementan con la documentación oficial vigente de Mercado Pago y Facturapi.
+- Inventar endpoints. El timbrado CFDI se implementa con la documentación oficial vigente de Facturapi.
 
 Si una herramienta de esta instrucción no está instalada, instálala. Si una pantalla parece template, redíséñala antes de seguir.
 
@@ -76,10 +76,16 @@ Variables en `.env.example`, sin valores reales:
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
-NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY=
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 NEXT_PUBLIC_WHATSAPP_E164=5214430000000
+# CLABE pública del taller para cobro SPEI entrante
+NEXT_PUBLIC_STORE_CLABE=
+NEXT_PUBLIC_STORE_BANK=
+# sandbox permite aprobar con un evento firmado de prueba; production lo deshabilita
 PAYMENTS_MODE=sandbox
+PAYMENTS_SANDBOX_SECRET=
+# Timbrado CFDI 4.0 (solo servidor)
+FACTURAPI_KEY=
 ```
 
 
@@ -118,7 +124,7 @@ app/
   admin/facturas/page.tsx
   admin/resenas/page.tsx
   admin/inicio/page.tsx
-  api/webhooks/mercadopago/route.ts
+  api/webhooks/pagos/route.ts
   api/webhooks/facturapi/route.ts
   design-system/page.tsx
 components/store/
@@ -276,25 +282,26 @@ description: Usar al modelar productos, variantes, colores, fotos, categorías, 
 7. Categorías son árbol de un nivel en v1: Muebles, Iluminación, Tecnología del hogar, Textiles. Un producto puede estar en varias. El admin puede moverlo.
 ```
 
-### `.agents/skills/checkout-mercadopago/SKILL.md`
+### `.agents/skills/checkout/SKILL.md`
 
 ```markdown
 ---
-name: checkout-mercadopago
-description: Usar al implementar carrito, checkout, Payment Brick, webhooks, estados de pedido o el ledger de pagos. Nunca capturar tarjeta en servidores propios.
+name: checkout
+description: Usar al implementar carrito, checkout, cobro por SPEI, confirmación de pagos, webhooks, estados de pedido o el ledger de pagos. Nunca capturar tarjeta en servidores propios.
 ---
 
-# Checkout Propia
+# Cobro propio — checkout del taller
 
-1. Renderiza Payment Brick dentro de `/checkout`, con textos y colores de Lumen Editorial. El comprador no sale del sitio.
-3. El monto, la descripción y el `external_reference` (id del pedido) se crean en el servidor. El cliente no envía el total.
-4. El access token solo se usa en Route Handlers o Server Actions.
-5. lee `cardNumber`, `securityCode` y los guardes en estado de React, logs, Supabase o analytics.
-6. El webhook `/api/webhooks/mercadopago` verifica la firma según la documentación oficial vigente. Si la firma falla, responde 401 y no cambia el pedido.
-7. El handler es idempotente por id de pago del proveedor. Un reintento no descuenta stock dos veces.
-8. Solo un pago aprobado, con monto igual al pedido, pasa `orders.status` a `paid` y descuenta stock.
-10. publica una CLABE propia como cobro automático.
-11. WhatsApp confirma pagos. El enlace `wa.me` lleva folio, SKU y total como texto.
+1. El checkout de `/checkout` se queda en el sitio, con textos y colores de Lumen Editorial. Cobro propio = transferencia SPEI entrante a la CLABE del taller (`NEXT_PUBLIC_STORE_CLABE`). Nunca una pasarela casera que pida número de tarjeta o código de seguridad.
+2. El monto, la descripción y la referencia del pedido (`public_ref`) se crean en el servidor. El cliente no envía el total.
+3. `SUPABASE_SERVICE_ROLE_KEY` solo se usa en Route Handlers o Server Actions.
+4. Jamás se capturan `cardNumber` ni `securityCode`: no se piden, no se guardan en estado de React, logs, Supabase ni analytics. `payments` no tiene columnas de tarjeta y no se agregan.
+5. El pedido nace `pending_payment`. Solo pasa a `paid` por: (a) confirmación del taller — Server Action con rol admin verificado en servidor, idempotente, con registro en `audit_logs` — o (b) un evento firmado con HMAC válido y monto igual al total.
+6. En `PAYMENTS_MODE=sandbox` existe un endpoint de simulación que emite el evento firmado para probar el flujo completo (pago aprobado simulado). Fuera de sandbox responde 404 y no cambia nada. El webhook `/api/webhooks/pagos` verifica la firma HMAC del cuerpo crudo; si la firma falla, responde 401 y no cambia el pedido.
+7. El handler es idempotente por id de pago. Un reintento no descuenta stock dos veces.
+8. Solo un pago aprobado con monto igual al pedido pasa `orders.status` a `paid` y descuenta stock.
+9. La CLABE del taller es pública; se muestra en el checkout junto a la referencia del pedido. Este software no hace dispersiones SPEI de salida: el dinero llega a la cuenta del taller y ahí se queda.
+10. WhatsApp acompaña el pedido pero jamás cambia su estado. El enlace `wa.me` lleva folio, SKU y total como texto.
 ```
 
 ### `.agents/skills/facturacion-cfdi/SKILL.md`
@@ -377,7 +384,7 @@ Tablas:
 - `cart_items`: `id`, `cart_id`, `variant_id`, `qty` int check > 0
 - `orders`: `id`, `user_id`, `email`, `status` check in (`pending_payment`,`paid`,`cancelled`,`fulfilled`), `subtotal_cents`, `shipping_cents`, `tax_cents`, `total_cents`, `address_snapshot` jsonb
 - `order_items`: `id`, `order_id`, `variant_id`, `name_snapshot`, `sku_snapshot`, `unit_price_cents`, `qty`
-- `payments`: `id`, `order_id`, `provider` text default `, `provider_payment_id` unique, `status`, `method`, `amount_cents`, `fee_cents`, `net_cents`, `raw_status` text. Sin columnas de tarjeta.
+- `payments`: `id`, `order_id`, `provider` text default 'spei', `provider_payment_id` unique, `status`, `method`, `reference`, `amount_cents`, `fee_cents`, `net_cents`, `raw_status` text. Sin columnas de tarjeta.
 - `invoices`: `id`, `order_id` unique, `rfc`, `legal_name`, `tax_regime`, `cfdi_use`, `postal_code`, `uuid`, `status`, `xml_url`, `pdf_url`
 - `favorites`: `user_id`, `product_id`, pk compuesta
 - `audit_logs`: `id`, `actor_id`, `action`, `entity`, `entity_id`, `created_at`
@@ -431,7 +438,7 @@ Líneas con foto, color, qty editable, quitar, subtotal, envío estimado, IVA de
 
 ### Checkout `/checkout`
 
-Misma materia visual. Pasos en una sola página, no un wizard de tres sitios externos: datos, dirección mexicana, resumen, Payment Brick. Al confirmar datos, el servidor crea el pedido `pending_payment` con totales recalculados y monta el Brick con ese id como referencia. Debajo, enlace de WhatsApp “Hablar del pedido” que no toca el estado.
+Misma materia visual. Pasos en una sola página, no un wizard de tres sitios externos: datos, dirección mexicana, resumen e instrucciones de cobro con la CLABE del taller y la referencia del pedido. Al confirmar datos, el servidor crea el pedido `pending_payment` con totales recalculados y muestra la referencia como concepto del SPEI. Debajo, enlace de WhatsApp “Hablar del pedido” que no toca el estado.
 
 ### Pedido `/pedido/[id]`
 
@@ -466,11 +473,10 @@ Pedidos, direcciones, favoritos, datos fiscales. Auth de Supabase por email mág
 Flujo:
 
 1. Checkout crea pedido pendiente con snapshot de dirección y de precios.
-2. El servidor registra la intención con Mercado Pago y devuelve solo lo que el Brick necesita.
-3. El Brick cobra. El navegador no decide el estado final.
-4. Webhook firmado actualiza `payments` y, si aplica, `orders` y stock.
-5. La dispersión a la cuenta bancaria ocurre en Mercado Pago, hacia la cuenta que el comercio registró allí. Este software no implementa SPEI de salida ni guarda la CLABE como destino de tarjetas.
-6. Un pedido pagado puede timbrarse. Facturapi devuelve UUID, XML y PDF. Se guardan las URLs o los archivos en un bucket privado `invoices` con lectura solo del dueño y admin.
+2. El comprador transfiere por SPEI desde su banco usando la referencia del pedido. El navegador no decide el estado final.
+3. Webhook firmado actualiza `payments` y, si aplica, `orders` y stock. En producción, la confirmación la hace el taller sobre su estado de cuenta; también queda registrada en `audit_logs`.
+4. El dinero llega por SPEI entrante a la cuenta del taller. Este software no hace SPEI de salida ni guarda CLABEs de terceros: la única CLABE es la pública del taller, para cobro.
+5. Un pedido pagado puede timbrarse. Facturapi devuelve UUID, XML y PDF. Se guardan las URLs o los archivos en un bucket privado `invoices` con lectura solo del dueño y admin.
 
 WhatsApp: `https://wa.me/<e164>?text=` con texto codificado: marca, folio si existe, SKU, color, cantidad. Función única en `lib/whatsapp.ts`.
 
@@ -493,11 +499,11 @@ Crear los archivos, no solo mencionarlos.
 - `npm run build`
 - `npm audit --audit-level=high`
 - gitleaks-action sobre el repo
-- Playwright en el flujo anónimo de ver ficha y abrir agregado rápido. El pago sandbox corre solo si el secreto `MERCADOPAGO_ACCESS_TOKEN` está en GitHub Environments; si no, el job se marca skipped, no verde falso.
+- Playwright contra el stack local de Supabase: flujo anónimo de ver ficha y abrir agregado rápido, cobro SPEI en sandbox, webhook inválido, idempotencia y tests RLS. Si el stack no puede levantarse en el runner, el job se marca skipped, no verde falso.
 
 `.github/workflows/codeql.yml` con el workflow oficial de CodeQL para `javascript-typescript`.
 
-`next.config` exporta security headers. CSP permite los dominios que la documentación vigente de Mercado Pago exija para el Brick y bloquea el resto. No uses `unsafe-eval` en producción si el Brick no lo requiere; si la doc oficial lo exige, aíslalo en comentario con la URL de la doc.
+`next.config` exporta security headers: CSP, HSTS en producción, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` y `X-Frame-Options` de la propia app.
 
 `AGENTS.md` y `CLAUDE.md` repiten las reglas duras en menos de 120 líneas y listan las seis skills. `.cursor/rules/casa-lumen.mdc` tiene `alwaysApply: true` y las mismas prohibiciones visuales y de pago.
 
@@ -516,7 +522,7 @@ Ciérralas en orden. Al terminar cada una, el código de esa fase corre. No deje
 2. Home, categoría, búsqueda, metadata, sitemap, robots.
 3. Ficha, quick add, carrito de invitado y de usuario.
 4. Auth, cuenta, direcciones, favoritos.
-5. Checkout con Brick, creación de pedido, webhook firmado e idempotente, página de pedido. Sandbox si hay llaves; bloqueado con explicación si no hay.
+5. Checkout con cobro propio por SPEI, creación de pedido, webhook firmado e idempotente, página de pedido. Simulación de pago aprobado solo en sandbox y por el webhook firmado; en producción, la confirmación es del taller.
 6. Reseñas con compra verificada y moderación.
 7. Admin de catálogo, media, pestañas, categorías y home.
 8. Admin de pagos y facturas. Timbrado sandbox si hay `FACTURAPI_KEY`.

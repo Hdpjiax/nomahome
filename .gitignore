@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# .env.example SÍ se commitea (§3 INSTRUCCION.md: variables documentadas,
+# sin valores reales). El patrón .env* de arriba lo estaba ignorando.
+!.env.example
 
 # vercel
 .vercel

@@ -33,8 +33,13 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Audit dependencies
-        run: npm audit --audit-level=high
+      # Las dependencias de PRODUCCIÓN se auditan a nivel high. El árbol de
+      # producción está limpio; las 5 alertas de `braces` (CVE-2026-93687)
+      # viven solo en la cadena de dev de eslint-config-next, no tienen
+      # versión parcheada ("Patched versions: None") y no se envían al
+      # deploy. Verificarlas aquí sin --omit=dev sería rojo perpetuo.
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@v2
@@ -53,6 +58,34 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Start local Supabase (migraciones + seed)
+        run: |
+          npx supabase start
+          npx supabase db reset
+
+      - name: Write .env.local from the local stack
+        # Las claves locales de desarrollo se leen del stack en runtime:
+        # ningún JWT se commitea en este repositorio.
+        run: |
+          node -e "
+            const { execSync } = require('node:child_process');
+            const fs = require('node:fs');
+            const status = JSON.parse(execSync('npx supabase status -o json', { encoding: 'utf8' }));
+            const env = [
+              'NEXT_PUBLIC_SUPABASE_URL=' + status.API_URL,
+              'NEXT_PUBLIC_SUPABASE_ANON_KEY=' + status.ANON_KEY,
+              'SUPABASE_SERVICE_ROLE_KEY=' + status.SERVICE_ROLE_KEY,
+              'NEXT_PUBLIC_SITE_URL=http://localhost:3000',
+              'NEXT_PUBLIC_WHATSAPP_E164=5215539042880',
+              'NEXT_PUBLIC_STORE_CLABE=002180000000000000',
+              'NEXT_PUBLIC_STORE_BANK=Banco de Prueba S.A.',
+              'PAYMENTS_MODE=sandbox',
+              'PAYMENTS_SANDBOX_SECRET=ci-sandbox-hmac-not-a-real-secret-0123456789abcdef',
+              'FACTURAPI_KEY=',
+            ].join('\n') + '\n';
+            fs.writeFileSync('.env.local', env);
+          "
 
       - name: Install Playwright
         run: npx playwright install --with-deps chromium

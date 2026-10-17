@@ -27,7 +27,13 @@ export default function InvoiceActions({
             onClick={() =>
               start(async () => {
                 const result = await resendInvoiceAction(invoiceId);
-                setMessage(result.status === 'ok' ? 'Reenviada.' : (result.status === 'error' ? result.message : ''));
+                setMessage(
+                  result.status === 'ok'
+                    ? 'Reenviada.'
+                    : result.status === 'error'
+                      ? result.message
+                      : ''
+                );
                 router.refresh();
               })
             }
@@ -41,7 +47,13 @@ export default function InvoiceActions({
             onClick={() =>
               start(async () => {
                 const result = await cancelInvoiceAction(invoiceId);
-                setMessage(result.status === 'ok' ? 'Cancelada.' : (result.status === 'error' ? result.message : ''));
+                setMessage(
+                  result.status === 'ok'
+                    ? 'Cancelada.'
+                    : result.status === 'error'
+                      ? result.message
+                      : ''
+                );
                 router.refresh();
               })
             }

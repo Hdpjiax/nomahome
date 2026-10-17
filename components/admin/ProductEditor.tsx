@@ -147,7 +147,12 @@ export default function ProductEditor({
     setTabs(next);
     if (product.id) {
       startSave(async () => {
-        setTabState(await reorderTabsAction(product.id as string, next.map((t) => t.id)));
+        setTabState(
+          await reorderTabsAction(
+            product.id as string,
+            next.map((t) => t.id)
+          )
+        );
       });
     }
   }
@@ -159,15 +164,20 @@ export default function ProductEditor({
         <header className="flex flex-wrap items-baseline justify-between gap-[var(--space-3)]">
           <div>
             <p className="text-catalog mb-1">
-              <Link href="/admin/productos" className="hover:underline">Productos</Link> /{' '}
-              {isNew ? 'Nueva pieza' : product.sku}
+              <Link href="/admin/productos" className="hover:underline">
+                Productos
+              </Link>{' '}
+              / {isNew ? 'Nueva pieza' : product.sku}
             </p>
             <h1 className="font-display font-semibold text-3xl tracking-[-0.02em]">
               {isNew ? 'Crear pieza' : form.name}
             </h1>
           </div>
           {!isNew ? (
-            <Link href={`/producto/${form.slug}`} className="font-mono text-xs underline underline-offset-4 decoration-[var(--brass)]">
+            <Link
+              href={`/producto/${form.slug}`}
+              className="font-mono text-xs underline underline-offset-4 decoration-[var(--brass)]"
+            >
               ver ficha ↗
             </Link>
           ) : null}
@@ -178,52 +188,105 @@ export default function ProductEditor({
           <h2 className="font-display text-lg mb-[var(--space-3)]">Datos de la pieza</h2>
           <div className="grid grid-cols-2 gap-[var(--space-3)]">
             <div className="col-span-2 md:col-span-1">
-              <label className={label} htmlFor="p-name">Nombre</label>
-              <input id="p-name" className={field} value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              <label className={label} htmlFor="p-name">
+                Nombre
+              </label>
+              <input
+                id="p-name"
+                className={field}
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
             </div>
             <div className="col-span-2 md:col-span-1">
-              <label className={label} htmlFor="p-slug">Slug (URL)</label>
-              <input id="p-slug" className={field} value={form.slug}
-                onChange={(e) => setForm({ ...form, slug: e.target.value })} />
+              <label className={label} htmlFor="p-slug">
+                Slug (URL)
+              </label>
+              <input
+                id="p-slug"
+                className={field}
+                value={form.slug}
+                onChange={(e) => setForm({ ...form, slug: e.target.value })}
+              />
             </div>
             <div className="col-span-2 md:col-span-1">
-              <label className={label} htmlFor="p-sku">SKU padre</label>
-              <input id="p-sku" className={field} value={form.sku}
-                onChange={(e) => setForm({ ...form, sku: e.target.value.toUpperCase() })} />
+              <label className={label} htmlFor="p-sku">
+                SKU padre
+              </label>
+              <input
+                id="p-sku"
+                className={field}
+                value={form.sku}
+                onChange={(e) => setForm({ ...form, sku: e.target.value.toUpperCase() })}
+              />
             </div>
             <div className="col-span-2 md:col-span-1 flex items-end">
               <label className="flex items-center gap-2 text-sm font-ui pb-[6px]">
-                <input type="checkbox" className="w-4 h-4 accent-[var(--brass)]"
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 accent-[var(--brass)]"
                   checked={form.published}
-                  onChange={(e) => setForm({ ...form, published: e.target.checked })} />
+                  onChange={(e) => setForm({ ...form, published: e.target.checked })}
+                />
                 Publicada en vitrina
               </label>
             </div>
             <div className="col-span-2">
-              <label className={label} htmlFor="p-summary">Summary (frase de vitrina)</label>
-              <textarea id="p-summary" rows={2} className={field} value={form.summary}
-                onChange={(e) => setForm({ ...form, summary: e.target.value })} />
+              <label className={label} htmlFor="p-summary">
+                Summary (frase de vitrina)
+              </label>
+              <textarea
+                id="p-summary"
+                rows={2}
+                className={field}
+                value={form.summary}
+                onChange={(e) => setForm({ ...form, summary: e.target.value })}
+              />
             </div>
             <div className="col-span-2">
-              <label className={label} htmlFor="p-desc">Descripción</label>
-              <textarea id="p-desc" rows={4} className={field} value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })} />
+              <label className={label} htmlFor="p-desc">
+                Descripción
+              </label>
+              <textarea
+                id="p-desc"
+                rows={4}
+                className={field}
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+              />
             </div>
             <div className="col-span-2">
-              <label className={label} htmlFor="p-video">URL de video (opcional)</label>
-              <input id="p-video" className={field} value={form.videoUrl}
-                onChange={(e) => setForm({ ...form, videoUrl: e.target.value })} />
+              <label className={label} htmlFor="p-video">
+                URL de video (opcional)
+              </label>
+              <input
+                id="p-video"
+                className={field}
+                value={form.videoUrl}
+                onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
+              />
             </div>
             <div className="col-span-2 md:col-span-1">
-              <label className={label} htmlFor="p-seot">SEO title</label>
-              <input id="p-seot" className={field} value={form.seoTitle}
-                onChange={(e) => setForm({ ...form, seoTitle: e.target.value })} />
+              <label className={label} htmlFor="p-seot">
+                SEO title
+              </label>
+              <input
+                id="p-seot"
+                className={field}
+                value={form.seoTitle}
+                onChange={(e) => setForm({ ...form, seoTitle: e.target.value })}
+              />
             </div>
             <div className="col-span-2 md:col-span-1">
-              <label className={label} htmlFor="p-seod">SEO description</label>
-              <input id="p-seod" className={field} value={form.seoDescription}
-                onChange={(e) => setForm({ ...form, seoDescription: e.target.value })} />
+              <label className={label} htmlFor="p-seod">
+                SEO description
+              </label>
+              <input
+                id="p-seod"
+                className={field}
+                value={form.seoDescription}
+                onChange={(e) => setForm({ ...form, seoDescription: e.target.value })}
+              />
             </div>
           </div>
 
@@ -248,7 +311,12 @@ export default function ProductEditor({
             </div>
           </fieldset>
 
-          <button type="button" className="btn-primary text-sm mt-[var(--space-4)]" onClick={saveProduct} disabled={pendingSave}>
+          <button
+            type="button"
+            className="btn-primary text-sm mt-[var(--space-4)]"
+            onClick={saveProduct}
+            disabled={pendingSave}
+          >
             {pendingSave ? 'Guardando…' : isNew ? 'Crear pieza' : 'Guardar datos'}
           </button>
           <Note state={saveState} />
@@ -258,7 +326,10 @@ export default function ProductEditor({
         {!isNew ? (
           <section className="border border-[var(--line)] rounded-[var(--radius-m)] p-[var(--space-4)]">
             <h2 className="font-display text-lg mb-[var(--space-3)]">
-              Variantes <span className="font-mono text-xs text-[var(--ink-soft)]">({product.variants.length})</span>
+              Variantes{' '}
+              <span className="font-mono text-xs text-[var(--ink-soft)]">
+                ({product.variants.length})
+              </span>
             </h2>
             <div className="flex flex-col gap-[var(--space-4)]">
               {product.variants.map((v) => (
@@ -294,7 +365,9 @@ export default function ProductEditor({
                   className={`border border-[var(--line)] rounded-[var(--radius-m)] p-[var(--space-3)] ${dragIndex === i ? 'opacity-50' : ''}`}
                 >
                   <div className="flex items-center gap-[var(--space-3)]">
-                    <span className="font-mono text-[var(--ink-soft)] select-none" aria-hidden>⋮⋮</span>
+                    <span className="font-mono text-[var(--ink-soft)] select-none" aria-hidden>
+                      ⋮⋮
+                    </span>
                     <TabEditor
                       productId={product.id!}
                       tab={t}
@@ -304,14 +377,24 @@ export default function ProductEditor({
                       }}
                     />
                     <span className="flex flex-col gap-[2px]">
-                      <button type="button" aria-label="Subir pestaña"
+                      <button
+                        type="button"
+                        aria-label="Subir pestaña"
                         className="font-mono text-xs hover:text-[var(--brass)] disabled:opacity-30"
                         disabled={i === 0}
-                        onClick={() => persistOrder(i, i - 1)}>▲</button>
-                      <button type="button" aria-label="Bajar pestaña"
+                        onClick={() => persistOrder(i, i - 1)}
+                      >
+                        ▲
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Bajar pestaña"
                         className="font-mono text-xs hover:text-[var(--brass)] disabled:opacity-30"
                         disabled={i === tabs.length - 1}
-                        onClick={() => persistOrder(i, i + 1)}>▼</button>
+                        onClick={() => persistOrder(i, i + 1)}
+                      >
+                        ▼
+                      </button>
                     </span>
                   </div>
                 </li>
@@ -320,10 +403,19 @@ export default function ProductEditor({
             <Note state={tabState} />
             <div className="mt-[var(--space-4)] pt-[var(--space-4)] border-t border-[var(--line)]">
               <p className={label}>Nueva pestaña</p>
-              <input className={field} placeholder="Título (p. ej. Materiales y medidas)"
-                value={newTabTitle} onChange={(e) => setNewTabTitle(e.target.value)} />
-              <textarea className={`${field} mt-2`} rows={3} placeholder="Cuerpo de la pestaña"
-                value={newTabBody} onChange={(e) => setNewTabBody(e.target.value)} />
+              <input
+                className={field}
+                placeholder="Título (p. ej. Materiales y medidas)"
+                value={newTabTitle}
+                onChange={(e) => setNewTabTitle(e.target.value)}
+              />
+              <textarea
+                className={`${field} mt-2`}
+                rows={3}
+                placeholder="Cuerpo de la pestaña"
+                value={newTabBody}
+                onChange={(e) => setNewTabBody(e.target.value)}
+              />
               <button
                 type="button"
                 className="btn-secondary text-sm mt-2"
@@ -352,8 +444,13 @@ export default function ProductEditor({
           <p className="text-catalog mb-[var(--space-3)]">Previsualización de vitrina</p>
           <div className="bg-[var(--paper)] rounded-[var(--radius-m)] p-[var(--space-4)]">
             {preview.image ? (
-              <Image src={preview.image} alt={preview.name} width={400} height={500}
-                className="w-full aspect-[4/5] object-cover rounded-[var(--radius-m)]" />
+              <Image
+                src={preview.image}
+                alt={preview.name}
+                width={400}
+                height={500}
+                className="w-full aspect-[4/5] object-cover rounded-[var(--radius-m)]"
+              />
             ) : (
               <div className="w-full aspect-[4/5] rounded-[var(--radius-m)] bg-[var(--paper-2)] flex items-center justify-center">
                 <span className="font-mono text-xs text-[var(--ink-soft)]">sin foto</span>
@@ -370,8 +467,8 @@ export default function ProductEditor({
             ) : null}
           </div>
           <p className="text-xs text-[var(--ink-soft)] mt-[var(--space-3)] leading-relaxed">
-            Así se ve la celda en listados. La ficha completa usa la misma
-            materia con galería y pestañas.
+            Así se ve la celda en listados. La ficha completa usa la misma materia con galería y
+            pestañas.
           </p>
         </div>
       </aside>
@@ -398,20 +495,44 @@ function TabEditor({
   return (
     <div className="flex-1">
       <div className="flex gap-[var(--space-2)]">
-        <input className={field} value={title} onChange={(e) => setTitle(e.target.value)} aria-label="Título de pestaña" />
-        <button type="button" className="btn-secondary text-xs shrink-0" disabled={pending}
-          onClick={() => start(async () => { setState(await saveTabAction(tab.id, productId, title, body)); })}>
+        <input
+          className={field}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          aria-label="Título de pestaña"
+        />
+        <button
+          type="button"
+          className="btn-secondary text-xs shrink-0"
+          disabled={pending}
+          onClick={() =>
+            start(async () => {
+              setState(await saveTabAction(tab.id, productId, title, body));
+            })
+          }
+        >
           Guardar
         </button>
-        <button type="button" className="font-mono text-xs text-[var(--danger)] shrink-0"
-          onClick={() => start(async () => {
-            const result = await deleteTabAction(tab.id, productId);
-            if (result.status === 'ok') onDeleted();
-          })}>
+        <button
+          type="button"
+          className="font-mono text-xs text-[var(--danger)] shrink-0"
+          onClick={() =>
+            start(async () => {
+              const result = await deleteTabAction(tab.id, productId);
+              if (result.status === 'ok') onDeleted();
+            })
+          }
+        >
           Quitar
         </button>
       </div>
-      <textarea className={`${field} mt-2`} rows={3} value={body} onChange={(e) => setBody(e.target.value)} aria-label="Cuerpo de pestaña" />
+      <textarea
+        className={`${field} mt-2`}
+        rows={3}
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
+        aria-label="Cuerpo de pestaña"
+      />
       <Note state={state} />
     </div>
   );
@@ -458,14 +579,32 @@ function VariantCard({
   return (
     <div className="border border-[var(--line)] rounded-[var(--radius-m)] p-[var(--space-3)]">
       <div className="flex items-baseline justify-between gap-[var(--space-3)] mb-[var(--space-3)]">
-        <p className="font-mono text-xs">{v.sku} · {colorName}</p>
+        <p className="font-mono text-xs">
+          {v.sku} · {colorName}
+        </p>
         <div className="flex gap-[var(--space-2)] text-xs">
-          <button type="button" className="font-mono underline underline-offset-4 decoration-[var(--brass)]"
-            onClick={() => start(async () => { setState(await duplicateVariantAction(variant.id)); router.refresh(); })}>
+          <button
+            type="button"
+            className="font-mono underline underline-offset-4 decoration-[var(--brass)]"
+            onClick={() =>
+              start(async () => {
+                setState(await duplicateVariantAction(variant.id));
+                router.refresh();
+              })
+            }
+          >
             duplicar
           </button>
-          <button type="button" className="font-mono text-[var(--danger)] underline underline-offset-4"
-            onClick={() => start(async () => { setState(await deleteVariantAction(variant.id)); router.refresh(); })}>
+          <button
+            type="button"
+            className="font-mono text-[var(--danger)] underline underline-offset-4"
+            onClick={() =>
+              start(async () => {
+                setState(await deleteVariantAction(variant.id));
+                router.refresh();
+              })
+            }
+          >
             quitar
           </button>
         </div>
@@ -474,68 +613,127 @@ function VariantCard({
       <div className="grid grid-cols-3 md:grid-cols-6 gap-[var(--space-2)]">
         <div className="col-span-1">
           <label className={label}>SKU</label>
-          <input className={field} value={v.sku}
-            onChange={(e) => setV({ ...v, sku: e.target.value.toUpperCase() })} />
+          <input
+            className={field}
+            value={v.sku}
+            onChange={(e) => setV({ ...v, sku: e.target.value.toUpperCase() })}
+          />
         </div>
         <div className="col-span-1">
           <label className={label}>Color</label>
-          <select className={field} value={v.colorId}
-            onChange={(e) => setV({ ...v, colorId: e.target.value })}>
+          <select
+            className={field}
+            value={v.colorId}
+            onChange={(e) => setV({ ...v, colorId: e.target.value })}
+          >
             {colors.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
             ))}
           </select>
         </div>
         <div className="col-span-2">
           <label className={label}>Material</label>
-          <input className={field} value={v.material}
-            onChange={(e) => setV({ ...v, material: e.target.value })} />
+          <input
+            className={field}
+            value={v.material}
+            onChange={(e) => setV({ ...v, material: e.target.value })}
+          />
         </div>
         <div className="col-span-1">
           <label className={label}>Ancho</label>
-          <input className={field} type="number" value={v.widthCm ?? ''}
-            onChange={(e) => setV({ ...v, widthCm: e.target.value ? Number(e.target.value) : null })} />
+          <input
+            className={field}
+            type="number"
+            value={v.widthCm ?? ''}
+            onChange={(e) =>
+              setV({ ...v, widthCm: e.target.value ? Number(e.target.value) : null })
+            }
+          />
         </div>
         <div className="col-span-1">
           <label className={label}>Fondo</label>
-          <input className={field} type="number" value={v.depthCm ?? ''}
-            onChange={(e) => setV({ ...v, depthCm: e.target.value ? Number(e.target.value) : null })} />
+          <input
+            className={field}
+            type="number"
+            value={v.depthCm ?? ''}
+            onChange={(e) =>
+              setV({ ...v, depthCm: e.target.value ? Number(e.target.value) : null })
+            }
+          />
         </div>
         <div className="col-span-1">
           <label className={label}>Alto</label>
-          <input className={field} type="number" value={v.heightCm ?? ''}
-            onChange={(e) => setV({ ...v, heightCm: e.target.value ? Number(e.target.value) : null })} />
+          <input
+            className={field}
+            type="number"
+            value={v.heightCm ?? ''}
+            onChange={(e) =>
+              setV({ ...v, heightCm: e.target.value ? Number(e.target.value) : null })
+            }
+          />
         </div>
         <div className="col-span-1">
           <label className={label}>Peso kg</label>
-          <input className={field} type="number" step="0.1" value={v.weightKg ?? ''}
-            onChange={(e) => setV({ ...v, weightKg: e.target.value ? Number(e.target.value) : null })} />
+          <input
+            className={field}
+            type="number"
+            step="0.1"
+            value={v.weightKg ?? ''}
+            onChange={(e) =>
+              setV({ ...v, weightKg: e.target.value ? Number(e.target.value) : null })
+            }
+          />
         </div>
         <div className="col-span-1">
           <label className={label}>Centavos</label>
-          <input className={field} type="number" value={v.priceCents}
-            onChange={(e) => setV({ ...v, priceCents: Number(e.target.value) })} />
+          <input
+            className={field}
+            type="number"
+            value={v.priceCents}
+            onChange={(e) => setV({ ...v, priceCents: Number(e.target.value) })}
+          />
         </div>
         <div className="col-span-1">
           <label className={label}>Comparar</label>
-          <input className={field} type="number" value={v.compareAtCents ?? ''}
-            onChange={(e) => setV({ ...v, compareAtCents: e.target.value ? Number(e.target.value) : null })} />
+          <input
+            className={field}
+            type="number"
+            value={v.compareAtCents ?? ''}
+            onChange={(e) =>
+              setV({ ...v, compareAtCents: e.target.value ? Number(e.target.value) : null })
+            }
+          />
         </div>
         <div className="col-span-1">
           <label className={label}>Stock</label>
-          <input className={field} type="number" value={v.stock}
-            onChange={(e) => setV({ ...v, stock: Number(e.target.value) })} />
+          <input
+            className={field}
+            type="number"
+            value={v.stock}
+            onChange={(e) => setV({ ...v, stock: Number(e.target.value) })}
+          />
         </div>
         <div className="col-span-1 flex items-end pb-[4px]">
           <label className="flex items-center gap-1 text-xs font-ui">
-            <input type="checkbox" className="w-4 h-4 accent-[var(--brass)]"
-              checked={v.published} onChange={(e) => setV({ ...v, published: e.target.checked })} />
+            <input
+              type="checkbox"
+              className="w-4 h-4 accent-[var(--brass)]"
+              checked={v.published}
+              onChange={(e) => setV({ ...v, published: e.target.checked })}
+            />
             Publicada
           </label>
         </div>
       </div>
 
-      <button type="button" className="btn-primary text-xs mt-[var(--space-3)]" onClick={save} disabled={pending}>
+      <button
+        type="button"
+        className="btn-primary text-xs mt-[var(--space-3)]"
+        onClick={save}
+        disabled={pending}
+      >
         {pending ? 'Guardando…' : 'Guardar variante'}
       </button>
       <Note state={state} />
@@ -546,17 +744,55 @@ function VariantCard({
         <ul className="flex flex-wrap gap-[var(--space-2)]">
           {v.media.map((m, i) => (
             <li key={m.id} className="relative">
-              <Image src={m.path} alt={m.alt} width={96} height={120}
-                className="w-16 h-20 object-cover rounded-[var(--radius-s)] border border-[var(--line)]" />
+              <Image
+                src={m.path}
+                alt={m.alt}
+                width={96}
+                height={120}
+                className="w-16 h-20 object-cover rounded-[var(--radius-s)] border border-[var(--line)]"
+              />
               <span className="absolute -top-2 -left-2 flex gap-[2px]">
-                <button type="button" aria-label="Subir foto" className="font-mono text-[10px] bg-[var(--paper)] border border-[var(--line)] rounded-[2px] px-[3px] disabled:opacity-30"
+                <button
+                  type="button"
+                  aria-label="Subir foto"
+                  className="font-mono text-[10px] bg-[var(--paper)] border border-[var(--line)] rounded-[2px] px-[3px] disabled:opacity-30"
                   disabled={i === 0}
-                  onClick={() => startUpload(async () => { await moveMediaAction(m.id, -1); router.refresh(); })}>▲</button>
-                <button type="button" aria-label="Bajar foto" className="font-mono text-[10px] bg-[var(--paper)] border border-[var(--line)] rounded-[2px] px-[3px] disabled:opacity-30"
+                  onClick={() =>
+                    startUpload(async () => {
+                      await moveMediaAction(m.id, -1);
+                      router.refresh();
+                    })
+                  }
+                >
+                  ▲
+                </button>
+                <button
+                  type="button"
+                  aria-label="Bajar foto"
+                  className="font-mono text-[10px] bg-[var(--paper)] border border-[var(--line)] rounded-[2px] px-[3px] disabled:opacity-30"
                   disabled={i === v.media.length - 1}
-                  onClick={() => startUpload(async () => { await moveMediaAction(m.id, 1); router.refresh(); })}>▼</button>
-                <button type="button" aria-label="Quitar foto" className="font-mono text-[10px] bg-[var(--paper)] border border-[var(--danger)] text-[var(--danger)] rounded-[2px] px-[3px]"
-                  onClick={() => startUpload(async () => { await deleteMediaAction(m.id); router.refresh(); })}>×</button>
+                  onClick={() =>
+                    startUpload(async () => {
+                      await moveMediaAction(m.id, 1);
+                      router.refresh();
+                    })
+                  }
+                >
+                  ▼
+                </button>
+                <button
+                  type="button"
+                  aria-label="Quitar foto"
+                  className="font-mono text-[10px] bg-[var(--paper)] border border-[var(--danger)] text-[var(--danger)] rounded-[2px] px-[3px]"
+                  onClick={() =>
+                    startUpload(async () => {
+                      await deleteMediaAction(m.id);
+                      router.refresh();
+                    })
+                  }
+                >
+                  ×
+                </button>
               </span>
             </li>
           ))}
@@ -586,14 +822,25 @@ function VariantCard({
           <div>
             <label className={label}>…o registrar ruta del repo</label>
             <div className="flex gap-1">
-              <input className={field} placeholder="/brand/seed/mi-pieza.svg" value={newPath}
-                onChange={(e) => setNewPath(e.target.value)} />
-              <button type="button" className="btn-secondary text-xs shrink-0"
-                onClick={() => startUpload(async () => {
-                  setState(await addMediaPathAction(variant.id, newPath, `${v.sku} en ${colorName}`));
-                  setNewPath('');
-                  router.refresh();
-                })}>
+              <input
+                className={field}
+                placeholder="/brand/seed/mi-pieza.svg"
+                value={newPath}
+                onChange={(e) => setNewPath(e.target.value)}
+              />
+              <button
+                type="button"
+                className="btn-secondary text-xs shrink-0"
+                onClick={() =>
+                  startUpload(async () => {
+                    setState(
+                      await addMediaPathAction(variant.id, newPath, `${v.sku} en ${colorName}`)
+                    );
+                    setNewPath('');
+                    router.refresh();
+                  })
+                }
+              >
                 Agregar
               </button>
             </div>
@@ -626,20 +873,52 @@ function NewVariant({
     <div className="mt-[var(--space-4)] pt-[var(--space-4)] border-t border-[var(--line)]">
       <p className={label}>Nueva variante</p>
       <div className="flex flex-wrap items-end gap-[var(--space-2)]">
-        <input className={`${field} w-40`} placeholder="SKU (CL-XXX-YYY)" value={sku}
-          onChange={(e) => setSku(e.target.value.toUpperCase())} aria-label="SKU de variante" />
-        <select className={`${field} w-32`} value={colorId} onChange={(e) => setColorId(e.target.value)} aria-label="Color">
+        <input
+          className={`${field} w-40`}
+          placeholder="SKU (CL-XXX-YYY)"
+          value={sku}
+          onChange={(e) => setSku(e.target.value.toUpperCase())}
+          aria-label="SKU de variante"
+        />
+        <select
+          className={`${field} w-32`}
+          value={colorId}
+          onChange={(e) => setColorId(e.target.value)}
+          aria-label="Color"
+        >
           {colors.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
           ))}
         </select>
-        <input className={`${field} flex-1 min-w-40`} placeholder="Material" value={material}
-          onChange={(e) => setMaterial(e.target.value)} aria-label="Material" />
-        <input className={`${field} w-28`} type="number" placeholder="Centavos" value={priceCents || ''}
-          onChange={(e) => setPriceCents(Number(e.target.value))} aria-label="Precio en centavos" />
-        <input className={`${field} w-20`} type="number" placeholder="Stock" value={stock || ''}
-          onChange={(e) => setStock(Number(e.target.value))} aria-label="Stock" />
-        <button type="button" className="btn-primary text-xs" disabled={pending || !sku || !colorId}
+        <input
+          className={`${field} flex-1 min-w-40`}
+          placeholder="Material"
+          value={material}
+          onChange={(e) => setMaterial(e.target.value)}
+          aria-label="Material"
+        />
+        <input
+          className={`${field} w-28`}
+          type="number"
+          placeholder="Centavos"
+          value={priceCents || ''}
+          onChange={(e) => setPriceCents(Number(e.target.value))}
+          aria-label="Precio en centavos"
+        />
+        <input
+          className={`${field} w-20`}
+          type="number"
+          placeholder="Stock"
+          value={stock || ''}
+          onChange={(e) => setStock(Number(e.target.value))}
+          aria-label="Stock"
+        />
+        <button
+          type="button"
+          className="btn-primary text-xs"
+          disabled={pending || !sku || !colorId}
           onClick={() =>
             start(async () => {
               const result = await saveVariantAction(null, productId, {
@@ -658,7 +937,8 @@ function NewVariant({
               setState(result);
               if (result.status === 'ok') onDone();
             })
-          }>
+          }
+        >
           Agregar variante
         </button>
       </div>

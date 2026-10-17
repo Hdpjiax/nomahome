@@ -38,7 +38,13 @@ export default function OrderPaymentActions({ orderId }: { orderId: string }) {
         onClick={() =>
           start(async () => {
             const result = await markPaymentReviewAction(orderId);
-            setMessage(result.status === 'ok' ? result.message : (result.status === 'error' ? result.message : ''));
+            setMessage(
+              result.status === 'ok'
+                ? result.message
+                : result.status === 'error'
+                  ? result.message
+                  : ''
+            );
             router.refresh();
           })
         }

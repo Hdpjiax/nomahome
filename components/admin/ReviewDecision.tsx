@@ -5,13 +5,7 @@ import { useRouter } from 'next/navigation';
 import { moderateReviewAction } from '@/lib/reviews/actions';
 
 /** Publicar o rechazar (§8 admin). Solo admin: verificado en servidor. */
-export default function ReviewDecision({
-  reviewId,
-  status,
-}: {
-  reviewId: string;
-  status: string;
-}) {
+export default function ReviewDecision({ reviewId, status }: { reviewId: string; status: string }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
