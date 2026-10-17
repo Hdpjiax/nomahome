@@ -12,6 +12,7 @@ import {
   uploadMediaAction,
   addMediaPathAction,
   moveMediaAction,
+  reorderMediaAction,
   deleteMediaAction,
   saveTabAction,
   reorderTabsAction,
@@ -553,8 +554,40 @@ function VariantCard({
   const [pending, start] = useTransition();
   const [uploading, startUpload] = useTransition();
   const [newPath, setNewPath] = useState('');
+  // Índice de la foto arrastrada (§8: drag de fotos persiste orden).
+  const [dragPhoto, setDragPhoto] = useState<number | null>(null);
+
+  // El servidor manda media fresca tras cada mutación (router.refresh):
+  // los campos que el admin edita se respetan, pero el arreglo de fotos
+  // se sincroniza con el prop nuevo — sin esto, agregar/quitar/reordenar
+  // fotos no se veía hasta recargar la página (patrón de React: ajustar
+  // estado derivado de props durante el render).
+  const [lastMedia, setLastMedia] = useState(variant.media);
+  if (variant.media !== lastMedia) {
+    setLastMedia(variant.media);
+    setV((prev) => ({ ...prev, media: variant.media }));
+  }
 
   const colorName = colors.find((c) => c.id === v.colorId)?.name ?? '—';
+
+  function dropPhoto(to: number) {
+    const from = dragPhoto;
+    setDragPhoto(null);
+    if (from === null || from === to) return;
+    const next = [...v.media];
+    const [moved] = next.splice(from, 1);
+    next.splice(to, 0, moved);
+    setV({ ...v, media: next });
+    startUpload(async () => {
+      setState(
+        await reorderMediaAction(
+          moved.id,
+          next.map((m) => m.id)
+        )
+      );
+      router.refresh();
+    });
+  }
 
   function save() {
     start(async () => {
@@ -740,10 +773,20 @@ function VariantCard({
 
       {/* Media de la variante */}
       <div className="mt-[var(--space-3)] pt-[var(--space-3)] border-t border-[var(--line)]">
-        <p className={label}>Fotos ({v.media.length}) — el orden se persiste</p>
-        <ul className="flex flex-wrap gap-[var(--space-2)]">
+        <p className={label}>
+          Fotos ({v.media.length}) — arrastra o usa las flechas; el orden se persiste
+        </p>
+        <ul data-testid="variant-photos" className="flex flex-wrap gap-[var(--space-2)]">
           {v.media.map((m, i) => (
-            <li key={m.id} className="relative">
+            <li
+              key={m.id}
+              className={`relative ${dragPhoto === i ? 'opacity-50' : ''}`}
+              draggable
+              onDragStart={() => setDragPhoto(i)}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={() => dropPhoto(i)}
+              onDragEnd={() => setDragPhoto(null)}
+            >
               <Image
                 src={m.path}
                 alt={m.alt}

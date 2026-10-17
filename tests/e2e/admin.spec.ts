@@ -20,15 +20,15 @@ test.describe('Panel de administración', () => {
     const { data } = await admin
       .from('profiles')
       .select('id')
-      .eq('id', (
-        await admin.auth.admin.listUsers({ page: 1, perPage: 1000 })
-      ).data.users?.find((u) => u.email === email)!.id)
+      .eq(
+        'id',
+        (await admin.auth.admin.listUsers({ page: 1, perPage: 1000 })).data.users?.find(
+          (u) => u.email === email
+        )!.id
+      )
       .maybeSingle();
     expect(data).toBeDefined();
-    const { error } = await admin
-      .from('profiles')
-      .update({ role: 'admin' })
-      .eq('id', data!.id);
+    const { error } = await admin.from('profiles').update({ role: 'admin' }).eq('id', data!.id);
     expect(error).toBeNull();
   }
 
@@ -102,10 +102,36 @@ test.describe('Panel de administración', () => {
       .inputValue();
     expect(primerTitulo).toBe(ahoraSegundo);
 
+    // Fotos: registrar una segunda y reordenar por ARRASTRE (§8 editor:
+    // drag de pestañas y de fotos persiste orden)
+    await page
+      .getByPlaceholder('/brand/seed/mi-pieza.svg')
+      .first()
+      .fill('/brand/seed/sofa-norte-220-tinta.svg');
+    await page.getByRole('button', { name: 'Agregar', exact: true }).first().click();
+    await expect(page.getByText('Imagen registrada.')).toBeVisible({ timeout: 15000 });
+
+    const fotos = page.getByTestId('variant-photos').first().locator('li');
+    await expect(fotos).toHaveCount(2, { timeout: 15000 });
+    const primeraAntes = await fotos.nth(0).locator('img').getAttribute('src');
+    await fotos.nth(0).dispatchEvent('dragstart');
+    await fotos.nth(1).dispatchEvent('drop');
+    await expect(page.getByText('Orden de fotos guardado.')).toBeVisible({ timeout: 15000 });
+
+    // El orden sobrevive la recarga: la foto arrastrada quedó al final
+    await page.reload();
+    const fotosTras = page.getByTestId('variant-photos').first().locator('li');
+    await expect(fotosTras).toHaveCount(2, { timeout: 15000 });
+    const primeraDespues = await fotosTras.locator('img').first().getAttribute('src');
+    expect(primeraDespues).not.toBe(primeraAntes);
+
     // Categorías: mover pieza explícitamente
     await page.goto('/admin/categorias');
     await expect(page.getByRole('heading', { name: 'Categorías' })).toBeVisible();
-    await page.locator('select').first().selectOption({ label: 'CL-HUB-120 · Hub de cortinas motorizadas' });
+    await page
+      .locator('select')
+      .first()
+      .selectOption({ label: 'CL-HUB-120 · Hub de cortinas motorizadas' });
     await page.getByRole('button', { name: 'Mover' }).click();
     await expect(page.getByText(/movida a/i)).toBeVisible({ timeout: 15000 });
 

@@ -94,7 +94,13 @@ export async function saveProductAction(
       if (catError) throw catError;
     }
 
-    await audit(admin, actorId, productId ? 'product.updated' : 'product.created', 'products', productId_);
+    await audit(
+      admin,
+      actorId,
+      productId ? 'product.updated' : 'product.created',
+      'products',
+      productId_
+    );
 
     revalidatePath('/admin/productos');
     revalidatePath(`/admin/productos/${productId_}`);
@@ -120,12 +126,15 @@ export async function toggleProductPublishedAction(
     return { status: 'error', message: 'No tienes permiso de taller.' };
   }
   const admin = createAdminClient();
-  const { error } = await admin
-    .from('products')
-    .update({ published })
-    .eq('id', productId);
+  const { error } = await admin.from('products').update({ published }).eq('id', productId);
   if (error) return { status: 'error', message: 'No se pudo cambiar el estado.' };
-  await audit(admin, actorId, published ? 'product.published' : 'product.unpublished', 'products', productId);
+  await audit(
+    admin,
+    actorId,
+    published ? 'product.published' : 'product.unpublished',
+    'products',
+    productId
+  );
   revalidatePath('/admin/productos');
   revalidatePath('/');
   return { status: 'ok', message: published ? 'Pieza publicada.' : 'Pieza fuera de vitrina.' };
@@ -193,11 +202,19 @@ export async function saveVariantAction(
     const msg = e instanceof Error ? e.message : 'error';
     return {
       status: 'error',
-      message: msg.includes('duplicate') ? 'Ese SKU de variante ya existe.' : 'No se pudo guardar la variante.',
+      message: msg.includes('duplicate')
+        ? 'Ese SKU de variante ya existe.'
+        : 'No se pudo guardar la variante.',
     };
   }
 
-  await audit(admin, actorId, variantId ? 'variant.updated' : 'variant.created', 'product_variants', variantId);
+  await audit(
+    admin,
+    actorId,
+    variantId ? 'variant.updated' : 'variant.created',
+    'product_variants',
+    variantId
+  );
   revalidatePath(`/admin/productos/${productId}`);
   revalidatePath('/');
   return { status: 'ok', message: 'Variante guardada.' };
@@ -288,7 +305,8 @@ export async function uploadMediaAction(
   }
 
   const admin = createAdminClient();
-  const ext = file.type === 'image/svg+xml' ? 'svg' : file.type.split('/')[1].replace('jpeg', 'jpg');
+  const ext =
+    file.type === 'image/svg+xml' ? 'svg' : file.type.split('/')[1].replace('jpeg', 'jpg');
   const path = `piezas/${variantId}/${Date.now()}.${ext}`;
   const { error: upError } = await admin.storage
     .from('product-media')
@@ -374,6 +392,52 @@ export async function moveMediaAction(mediaId: string, direction: -1 | 1): Promi
   revalidatePath('/');
 }
 
+/**
+ * Reorden absoluto de las fotos de una variante por arrastre (§8 editor:
+ * "drag de pestañas y de fotos persiste orden"). Solo acepta ids que ya
+ * viven en la variante del medio arrastrado: no se puede colar una foto
+ * ajena por el cuerpo del request.
+ */
+export async function reorderMediaAction(
+  mediaId: string,
+  orderedIds: string[]
+): Promise<AdminState> {
+  let actorId: string;
+  try {
+    actorId = (await assertAdmin()).id;
+  } catch {
+    return { status: 'error', message: 'No tienes permiso de taller.' };
+  }
+  const admin = createAdminClient();
+  const { data: media } = await admin
+    .from('product_media')
+    .select('id, variant_id, product_variants(product_id)')
+    .eq('id', mediaId)
+    .maybeSingle();
+  if (!media) return { status: 'error', message: 'La foto no existe.' };
+
+  const { data: siblings } = await admin
+    .from('product_media')
+    .select('id')
+    .eq('variant_id', media.variant_id);
+  const allowed = new Set((siblings ?? []).map((m) => m.id));
+  if (!allowed.has(mediaId)) return { status: 'error', message: 'La foto no es de esa variante.' };
+
+  const ids = orderedIds.filter((id) => allowed.has(id));
+  for (let i = 0; i < ids.length; i++) {
+    await admin
+      .from('product_media')
+      .update({ sort_order: i })
+      .eq('id', ids[i])
+      .eq('variant_id', media.variant_id); // no toca fotos ajenas
+  }
+  const productId = media.product_variants?.product_id;
+  await audit(admin, actorId, 'media.reordered', 'product_variants', media.variant_id);
+  if (productId) revalidatePath(`/admin/productos/${productId}`);
+  revalidatePath('/');
+  return { status: 'ok', message: 'Orden de fotos guardado.' };
+}
+
 export async function deleteMediaAction(mediaId: string): Promise<AdminState> {
   let actorId: string;
   try {
@@ -433,7 +497,10 @@ export async function saveTabAction(
   return { status: 'ok', message: 'Pestaña guardada.' };
 }
 
-export async function reorderTabsAction(productId: string, orderedIds: string[]): Promise<AdminState> {
+export async function reorderTabsAction(
+  productId: string,
+  orderedIds: string[]
+): Promise<AdminState> {
   let actorId: string;
   try {
     actorId = (await assertAdmin()).id;
@@ -497,19 +564,17 @@ export async function saveCategoryAction(
       const { error } = await admin.from('categories').update(data).eq('id', categoryId);
       if (error) throw error;
     } else {
-      const { count } = await admin
-        .from('categories')
-        .select('id', { count: 'exact', head: true });
-      const { error } = await admin
-        .from('categories')
-        .insert({ ...data, sort_order: count ?? 0 });
+      const { count } = await admin.from('categories').select('id', { count: 'exact', head: true });
+      const { error } = await admin.from('categories').insert({ ...data, sort_order: count ?? 0 });
       if (error) throw error;
     }
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'error';
     return {
       status: 'error',
-      message: msg.includes('duplicate') ? 'Ese slug de categoría ya existe.' : 'No se pudo guardar.',
+      message: msg.includes('duplicate')
+        ? 'Ese slug de categoría ya existe.'
+        : 'No se pudo guardar.',
     };
   }
   await audit(admin, actorId, 'category.saved', 'categories', categoryId);
@@ -518,10 +583,7 @@ export async function saveCategoryAction(
   return { status: 'ok', message: 'Categoría guardada.' };
 }
 
-export async function reorderCategoryAction(
-  categoryId: string,
-  direction: -1 | 1
-): Promise<void> {
+export async function reorderCategoryAction(categoryId: string, direction: -1 | 1): Promise<void> {
   try {
     await assertAdmin();
   } catch {
@@ -536,8 +598,14 @@ export async function reorderCategoryAction(
   const idx = arr.findIndex((c) => c.id === categoryId);
   const swapIdx = idx + direction;
   if (idx < 0 || swapIdx < 0 || swapIdx >= arr.length) return;
-  await admin.from('categories').update({ sort_order: arr[swapIdx].sort_order }).eq('id', arr[idx].id);
-  await admin.from('categories').update({ sort_order: arr[idx].sort_order }).eq('id', arr[swapIdx].id);
+  await admin
+    .from('categories')
+    .update({ sort_order: arr[swapIdx].sort_order })
+    .eq('id', arr[idx].id);
+  await admin
+    .from('categories')
+    .update({ sort_order: arr[idx].sort_order })
+    .eq('id', arr[swapIdx].id);
   revalidatePath('/admin/categorias');
   revalidatePath('/');
 }
@@ -579,7 +647,10 @@ export async function moveProductCategoryAction(
 
   const { error } = await admin
     .from('product_categories')
-    .upsert({ product_id: productId, category_id: toCat.id }, { onConflict: 'product_id,category_id' });
+    .upsert(
+      { product_id: productId, category_id: toCat.id },
+      { onConflict: 'product_id,category_id' }
+    );
   if (error) return { status: 'error', message: 'No se pudo mover la pieza.' };
 
   await audit(admin, actorId, 'product.moved_category', 'products', productId);
@@ -607,8 +678,14 @@ export async function moveHomeBlockAction(blockId: string, direction: -1 | 1): P
   const idx = arr.findIndex((b) => b.id === blockId);
   const swapIdx = idx + direction;
   if (idx < 0 || swapIdx < 0 || swapIdx >= arr.length) return;
-  await admin.from('homepage_blocks').update({ sort_order: arr[swapIdx].sort_order }).eq('id', arr[idx].id);
-  await admin.from('homepage_blocks').update({ sort_order: arr[idx].sort_order }).eq('id', arr[swapIdx].id);
+  await admin
+    .from('homepage_blocks')
+    .update({ sort_order: arr[swapIdx].sort_order })
+    .eq('id', arr[idx].id);
+  await admin
+    .from('homepage_blocks')
+    .update({ sort_order: arr[idx].sort_order })
+    .eq('id', arr[swapIdx].id);
   revalidatePath('/admin/inicio');
   revalidatePath('/');
 }
