@@ -45,7 +45,11 @@ test.describe('Accesibilidad axe', () => {
     const bad = serious(results.violations);
     expect(
       bad.map((v) => `${v.id} (${v.help}): ${v.nodes.length} nodos`),
-      JSON.stringify(bad.map((v) => v.nodes.map((n) => n.target)), null, 2)
+      JSON.stringify(
+        bad.map((v) => v.nodes.map((n) => n.target)),
+        null,
+        2
+      )
     ).toEqual([]);
   });
 
@@ -56,15 +60,25 @@ test.describe('Accesibilidad axe', () => {
     const bad = serious(results.violations);
     expect(
       bad.map((v) => `${v.id} (${v.help}): ${v.nodes.length} nodos`),
-      JSON.stringify(bad.map((v) => v.nodes.map((n) => n.target)), null, 2)
+      JSON.stringify(
+        bad.map((v) => v.nodes.map((n) => n.target)),
+        null,
+        2
+      )
     ).toEqual([]);
   });
 
   test('checkout: sin violaciones críticas ni serias', async ({ page }) => {
     // El checkout exige carrito: se llena desde la ficha.
+    // Este spec corre primero en el runner: la server action de carrito
+    // se compila bajo demanda en dev (Turbopack) y el primer hit tarda
+    // más que el timeout por defecto. 30s solo para este primer paso.
     await page.goto('/producto/mesa-de-roble-lerma');
-    await page.getByRole('button', { name: /Agregar al carrito/ }).first().click();
-    await expect(page.getByText('En el carrito')).toBeVisible();
+    await page
+      .getByRole('button', { name: /Agregar al carrito/ })
+      .first()
+      .click();
+    await expect(page.getByText('En el carrito')).toBeVisible({ timeout: 30_000 });
     await page.goto('/checkout');
     // El formulario debe estar renderizado Y con los estilos aplicados.
     const submit = page.getByRole('button', { name: 'Crear pedido y transferir' });
@@ -76,7 +90,11 @@ test.describe('Accesibilidad axe', () => {
     const bad = serious(results.violations);
     expect(
       bad.map((v) => `${v.id} (${v.help}): ${v.nodes.length} nodos`),
-      JSON.stringify(bad.map((v) => v.nodes.map((n) => n.target)), null, 2)
+      JSON.stringify(
+        bad.map((v) => v.nodes.map((n) => n.target)),
+        null,
+        2
+      )
     ).toEqual([]);
   });
 

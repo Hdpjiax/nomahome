@@ -25,7 +25,10 @@ test.describe('Facturación CFDI', () => {
     await expect(page.getByRole('heading', { name: /Hola, Cliente/i })).toBeVisible();
 
     await page.goto('/producto/silla-de-comedor-quiroga');
-    await page.getByRole('button', { name: /Agregar al carrito/ }).first().click();
+    await page
+      .getByRole('button', { name: /Agregar al carrito/ })
+      .first()
+      .click();
     await expect(page.getByText('En el carrito')).toBeVisible();
     await page.goto('/checkout');
     await page.getByLabel('¿A quién se entrega?').fill('Cliente CFDI');
@@ -48,10 +51,16 @@ test.describe('Facturación CFDI', () => {
 
     await page.getByLabel('RFC').first().fill('XAXX010101000');
     await page.getByLabel('Código postal fiscal', { exact: true }).first().fill('58000');
-    await page.getByLabel(/Nombre o razón social/).first().fill('Cliente CFDI SA DE CV');
+    await page
+      .getByLabel(/Nombre o razón social/)
+      .first()
+      .fill('Cliente CFDI SA DE CV');
 
     // Registrar la solicitud
-    await page.getByRole('button', { name: /Registrar solicitud|Pedir factura/ }).first().click();
+    await page
+      .getByRole('button', { name: /Registrar solicitud|Pedir factura/ })
+      .first()
+      .click();
     await expect(
       page.getByText(/solicitud quedó registrada|Timbrado no configurado/i).first()
     ).toBeVisible({ timeout: 15000 });
@@ -66,7 +75,10 @@ test.describe('Facturación CFDI', () => {
 
     // Pedido invitado por cobrar
     await page.goto('/producto/estante-de-acero-morelia');
-    await page.getByRole('button', { name: /Agregar al carrito/ }).first().click();
+    await page
+      .getByRole('button', { name: /Agregar al carrito/ })
+      .first()
+      .click();
     await expect(page.getByText('En el carrito')).toBeVisible();
     await page.goto('/checkout');
     await page.getByLabel('Nombre').fill('Comprador SPEI');
@@ -105,11 +117,15 @@ test.describe('Facturación CFDI', () => {
     expect(error).toBeNull();
 
     await page2.goto('/admin/pedidos');
-    const row = page2
-      .locator('tr', { hasText: folioPedido })
-      .first();
+    const row = page2.locator('tr', { hasText: folioPedido }).first();
     await row.getByRole('button', { name: 'Vi la transferencia' }).click();
-    await expect(page2.getByText('Pago confirmado por el taller.').first()).toBeVisible({ timeout: 15000 });
+
+    // La confirmación es una acción de servidor + router.refresh(): el
+    // mensaje del botón se desmonta con la fila nueva (el pedido ya no
+    // está por cobrar). La señal DURABLE es el flip de estado en la
+    // propia tabla: la fila pasa a Pagado con ledger approved.
+    await expect(row.locator('td', { hasText: 'Pagado' })).toBeVisible({ timeout: 20_000 });
+    await expect(row.getByText(/approved/)).toBeVisible({ timeout: 20_000 });
 
     // El pedido quedó pagado
     await page2.goto(`/pedido/${orderId}`);
