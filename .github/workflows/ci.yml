@@ -43,6 +43,11 @@ jobs:
 
       - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@v2
+        env:
+          # Requerido para escanear pull requests (v2 lo pide explícito;
+          # en push a main funciona sin él). GITHUB_TOKEN está disponible
+          # también en PRs de Dependabot, en solo lectura.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # Playwright contra el stack local de Supabase (§10): en push a main y
   # en pull request. Si el stack no puede levantarse, el job falla rojo —
