@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { formatMXN } from '@/lib/money';
 import { isFacturapiConfigured } from '@/lib/invoicing/facturapi';
-import InvoiceActions from './InvoiceActions';
+import InvoiceActions from '@/components/admin/InvoiceActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,15 +41,14 @@ export default async function AdminInvoicesPage() {
 
       {!isFacturapiConfigured() ? (
         <p className="text-xs text-[var(--brass)] border-l-2 border-[var(--brass)] pl-[var(--space-3)] mb-[var(--space-5)] max-w-xl leading-relaxed">
-          Timbrado no configurado: sin FACTURAPI_KEY las solicitudes se
-          registran como “sin timbrar”. No se generan XML ni PDF caseros.
+          Timbrado no configurado: sin FACTURAPI_KEY las solicitudes se registran como “sin
+          timbrar”. No se generan XML ni PDF caseros.
         </p>
       ) : null}
 
       {rows.length === 0 ? (
         <p className="text-sm text-[var(--ink-soft)]">
-          Sin facturas todavía. Aparecen cuando un cliente con pedido pagado
-          pide la suya.
+          Sin facturas todavía. Aparecen cuando un cliente con pedido pagado pide la suya.
         </p>
       ) : (
         <div className="border border-[var(--line)] rounded-[var(--radius-m)] overflow-x-auto">
@@ -67,15 +66,25 @@ export default async function AdminInvoicesPage() {
             </thead>
             <tbody className="font-mono">
               {rows.map((i) => (
-                <tr key={i.id} className="border-b border-[var(--line)] last:border-b-0 hover:bg-[var(--paper-2)]/60">
+                <tr
+                  key={i.id}
+                  className="border-b border-[var(--line)] last:border-b-0 hover:bg-[var(--paper-2)]/60"
+                >
                   <td className="px-[var(--space-3)] py-[var(--space-2)] whitespace-nowrap">
-                    <Link href={`/pedido/${i.order.id}`} className="underline underline-offset-4 decoration-[var(--brass)]">
+                    <Link
+                      href={`/pedido/${i.order.id}`}
+                      className="underline underline-offset-4 decoration-[var(--brass)]"
+                    >
                       {i.order.public_ref}
                     </Link>
-                    <span className="block text-[10px] text-[var(--ink-soft)] font-ui">{i.order.email}</span>
+                    <span className="block text-[10px] text-[var(--ink-soft)] font-ui">
+                      {i.order.email}
+                    </span>
                   </td>
                   <td className="px-[var(--space-3)] py-[var(--space-2)] text-xs">{i.rfc}</td>
-                  <td className="px-[var(--space-3)] py-[var(--space-2)] font-ui text-xs">{i.legal_name}</td>
+                  <td className="px-[var(--space-3)] py-[var(--space-2)] font-ui text-xs">
+                    {i.legal_name}
+                  </td>
                   <td className="px-[var(--space-3)] py-[var(--space-2)] text-[10px] max-w-32 break-all text-[var(--ink-soft)]">
                     {i.uuid ?? '—'}
                   </td>

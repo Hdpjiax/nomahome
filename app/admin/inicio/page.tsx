@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { createAdminClient } from '@/lib/supabase/admin';
-import HomeBlocksManager from './HomeBlocksManager';
+import HomeBlocksManager from '@/components/admin/HomeBlocksManager';
 
 export const dynamic = 'force-dynamic';
 

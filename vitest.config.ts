@@ -1,6 +1,16 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
+// El alias @ de tsconfig, resuelto desde la raíz del repo (tests/unit/
+// importa los módulos de lib/ como @/lib/...).
+const root = fileURLToPath(new URL('.', import.meta.url));
+
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': root,
+    },
+  },
   test: {
     environment: 'node',
     globals: true,

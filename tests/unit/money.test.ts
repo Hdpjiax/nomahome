@@ -7,7 +7,7 @@ import {
   orderTotal,
   formatMXN,
   assertCents,
-} from './index';
+} from '@/lib/money';
 
 describe('money — aritmética entera en centavos', () => {
   describe('splitIva — IVA contenido en el precio de vitrina', () => {

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { formatMXN } from '@/lib/money';
-import OrderPaymentActions from './OrderPaymentActions';
+import OrderPaymentActions from '@/components/admin/OrderPaymentActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,9 +27,7 @@ export default async function AdminOrdersPage() {
     admin.from('payments').select('order_id, status, raw_status, reference, method'),
   ]);
 
-  const payByOrder = new Map(
-    (payments ?? []).map((p) => [p.order_id, p])
-  );
+  const payByOrder = new Map((payments ?? []).map((p) => [p.order_id, p]));
 
   return (
     <div className="container-lumen py-[var(--space-7)]">
@@ -38,9 +36,8 @@ export default async function AdminOrdersPage() {
         Pedidos
       </h1>
       <p className="text-xs text-[var(--ink-soft)] max-w-2xl mb-[var(--space-5)] leading-relaxed">
-        Aquí se ve el surtido. El pago no se edita a mano: se CONFIRMA contra
-        el estado de cuenta del banco (acción con bitácora) o se marca en
-        revisión — y marcar revisión no es pagar.
+        Aquí se ve el surtido. El pago no se edita a mano: se CONFIRMA contra el estado de cuenta
+        del banco (acción con bitácora) o se marca en revisión — y marcar revisión no es pagar.
       </p>
 
       <div className="border border-[var(--line)] rounded-[var(--radius-m)] overflow-x-auto">
@@ -59,13 +56,21 @@ export default async function AdminOrdersPage() {
             {(orders ?? []).map((o) => {
               const pay = payByOrder.get(o.id);
               return (
-                <tr key={o.id} className="border-b border-[var(--line)] last:border-b-0 hover:bg-[var(--paper-2)]/60">
+                <tr
+                  key={o.id}
+                  className="border-b border-[var(--line)] last:border-b-0 hover:bg-[var(--paper-2)]/60"
+                >
                   <td className="px-[var(--space-3)] py-[var(--space-2)] whitespace-nowrap">
-                    <Link href={`/pedido/${o.id}`} className="underline underline-offset-4 decoration-[var(--brass)]">
+                    <Link
+                      href={`/pedido/${o.id}`}
+                      className="underline underline-offset-4 decoration-[var(--brass)]"
+                    >
                       {o.public_ref ?? o.id.slice(0, 8)}
                     </Link>
                   </td>
-                  <td className="px-[var(--space-3)] py-[var(--space-2)] font-ui text-xs">{o.email}</td>
+                  <td className="px-[var(--space-3)] py-[var(--space-2)] font-ui text-xs">
+                    {o.email}
+                  </td>
                   <td className="px-[var(--space-3)] py-[var(--space-2)] text-right tabular-nums">
                     {formatMXN(o.total_cents)}
                   </td>
@@ -95,9 +100,7 @@ export default async function AdminOrdersPage() {
                     )}
                   </td>
                   <td className="px-[var(--space-3)] py-[var(--space-2)]">
-                    {o.status === 'pending_payment' ? (
-                      <OrderPaymentActions orderId={o.id} />
-                    ) : null}
+                    {o.status === 'pending_payment' ? <OrderPaymentActions orderId={o.id} /> : null}
                   </td>
                 </tr>
               );

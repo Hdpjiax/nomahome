@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { signPayload, verifySignature } from './signature';
+import { signPayload, verifySignature } from '@/lib/payments/signature';
 
 describe('payments — firma de eventos', () => {
   const secret = 'secreto_de_pruebas_32_caracteres_minimo!!';

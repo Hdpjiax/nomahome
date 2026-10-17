@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { createAdminClient } from '@/lib/supabase/admin';
-import ProductEditor, { type EditorProduct } from './ProductEditor';
+import ProductEditor, { type EditorProduct } from '@/components/admin/ProductEditor';
 
 export const dynamic = 'force-dynamic';
 

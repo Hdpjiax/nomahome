@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { formatMXN } from '@/lib/money';
-import ReviewDecision from './ReviewDecision';
+import ReviewDecision from '@/components/admin/ReviewDecision';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,7 +40,10 @@ export default async function AdminReviewsPage() {
     <div className="container-lumen py-[var(--space-7)]">
       <p className="text-catalog mb-[var(--space-2)]">Taller · moderación</p>
       <h1 className="font-display font-semibold text-4xl tracking-[-0.02em] mb-[var(--space-5)]">
-        Reseñas <span className="font-mono text-base text-[var(--ink-soft)]">({pending.length} en revisión)</span>
+        Reseñas{' '}
+        <span className="font-mono text-base text-[var(--ink-soft)]">
+          ({pending.length} en revisión)
+        </span>
       </h1>
 
       {reviews.length === 0 ? (
@@ -60,7 +63,9 @@ export default async function AdminReviewsPage() {
                   </span>
                 </p>
                 {r.title ? <p className="font-semibold text-sm">{r.title}</p> : null}
-                <p className="text-sm text-[var(--ink-soft)] leading-relaxed mt-1 max-w-2xl">{r.body}</p>
+                <p className="text-sm text-[var(--ink-soft)] leading-relaxed mt-1 max-w-2xl">
+                  {r.body}
+                </p>
                 <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--ink-soft)]">
                   {r.author_name} · compra verificada
                   {r.product_variants ? ` · ${formatMXN(r.product_variants.price_cents)}` : ''}

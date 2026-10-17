@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { formatMXN } from '@/lib/money';
-import PublishToggle from './PublishToggle';
+import PublishToggle from '@/components/admin/PublishToggle';
 
 export const dynamic = 'force-dynamic';
 
@@ -72,26 +72,43 @@ export default async function AdminProductsPage() {
           </thead>
           <tbody className="font-mono">
             {rows.map((r) => (
-              <tr key={r.id} className="border-b border-[var(--line)] last:border-b-0 hover:bg-[var(--paper-2)]/60">
-                <td className="px-[var(--space-3)] py-[var(--space-2)] whitespace-nowrap">{r.sku}</td>
+              <tr
+                key={r.id}
+                className="border-b border-[var(--line)] last:border-b-0 hover:bg-[var(--paper-2)]/60"
+              >
+                <td className="px-[var(--space-3)] py-[var(--space-2)] whitespace-nowrap">
+                  {r.sku}
+                </td>
                 <td className="px-[var(--space-3)] py-[var(--space-2)]">
-                  <Link href={`/admin/productos/${r.id}`} className="underline underline-offset-4 decoration-[var(--brass)]">
+                  <Link
+                    href={`/admin/productos/${r.id}`}
+                    className="underline underline-offset-4 decoration-[var(--brass)]"
+                  >
                     {r.name}
                   </Link>
                 </td>
-                <td className="px-[var(--space-3)] py-[var(--space-2)] font-ui text-xs text-[var(--ink-soft)]">{r.cats || '—'}</td>
+                <td className="px-[var(--space-3)] py-[var(--space-2)] font-ui text-xs text-[var(--ink-soft)]">
+                  {r.cats || '—'}
+                </td>
                 <td className="px-[var(--space-3)] py-[var(--space-2)] text-right tabular-nums">
                   {r.minPrice !== null ? formatMXN(r.minPrice) : '—'}
                 </td>
-                <td className="px-[var(--space-3)] py-[var(--space-2)] text-right tabular-nums">{r.variants}</td>
-                <td className={`px-[var(--space-3)] py-[var(--space-2)] text-right tabular-nums ${r.stock <= 3 ? 'text-[var(--danger)]' : ''}`}>
+                <td className="px-[var(--space-3)] py-[var(--space-2)] text-right tabular-nums">
+                  {r.variants}
+                </td>
+                <td
+                  className={`px-[var(--space-3)] py-[var(--space-2)] text-right tabular-nums ${r.stock <= 3 ? 'text-[var(--danger)]' : ''}`}
+                >
                   {r.stock}
                 </td>
                 <td className="px-[var(--space-3)] py-[var(--space-2)]">
                   <PublishToggle productId={r.id} published={r.published} />
                 </td>
                 <td className="px-[var(--space-3)] py-[var(--space-2)] text-right whitespace-nowrap">
-                  <Link href={`/producto/${r.slug}`} className="font-mono text-xs underline underline-offset-4 decoration-[var(--brass)]">
+                  <Link
+                    href={`/producto/${r.slug}`}
+                    className="font-mono text-xs underline underline-offset-4 decoration-[var(--brass)]"
+                  >
                     ver ↗
                   </Link>
                 </td>

@@ -17,7 +17,17 @@
     "db:types": "supabase gen types typescript --local > lib/supabase/database.types.ts",
     "db:lint": "node scripts/db-lint.mjs",
     "seed:svgs": "node scripts/generate-seed-svg.mjs",
-    "og:png": "node scripts/generate-og.mjs"
+    "og:png": "node scripts/generate-og.mjs",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs}": [
+      "eslint --fix --max-warnings=0",
+      "prettier --write"
+    ],
+    "*.{css,json,yml,yaml}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

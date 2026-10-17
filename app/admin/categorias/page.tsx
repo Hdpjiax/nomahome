@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { createAdminClient } from '@/lib/supabase/admin';
-import CategoriesManager from './CategoriesManager';
+import CategoriesManager from '@/components/admin/CategoriesManager';
 
 export const dynamic = 'force-dynamic';
 
