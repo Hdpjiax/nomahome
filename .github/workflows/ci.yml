@@ -44,8 +44,10 @@ jobs:
       - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@v2
 
+  # Playwright contra el stack local de Supabase (§10): en push a main y
+  # en pull request. Si el stack no puede levantarse, el job falla rojo —
+  # nunca verde falso.
   e2e:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     steps:

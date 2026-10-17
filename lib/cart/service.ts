@@ -101,10 +101,16 @@ export async function readCart(admin: AdminClient): Promise<string | null> {
 }
 
 export async function getCartCount(): Promise<number> {
+  // La cookie se lee ANTES de crear el cliente admin: durante el prerender
+  // estático, cookies() corta el intento y la ruta queda dinámica. Así el
+  // build no exige NEXT_PUBLIC_SUPABASE_URL en el runner y un visitante
+  // sin cookie (primer toque, crawler) jamás abre el cliente service role.
+  const sessionId = await readCartSession();
+  if (!sessionId) return 0;
   const admin = createAdminClient();
-  const cartId = await readCart(admin);
-  if (!cartId) return 0;
-  const { data, error } = await admin.from('cart_items').select('qty').eq('cart_id', cartId);
+  const cart = await findCart(admin, sessionId, null);
+  if (!cart) return 0;
+  const { data, error } = await admin.from('cart_items').select('qty').eq('cart_id', cart.id);
   if (error || !data) return 0;
   return data.reduce((n, i) => n + i.qty, 0);
 }
@@ -123,20 +129,18 @@ type LineRow = {
   id: string;
   variant_id: string;
   qty: number;
-  product_variants:
-    | {
-        id: string;
-        sku: string;
-        material: string;
-        price_cents: number;
-        compare_at_cents: number | null;
-        stock: number;
-        published: boolean;
-        colors: { name: string; hex: string } | null;
-        products: { slug: string; name: string; sku: string } | null;
-        product_media: { path: string; alt: string; sort_order: number }[] | null;
-      }
-    | null;
+  product_variants: {
+    id: string;
+    sku: string;
+    material: string;
+    price_cents: number;
+    compare_at_cents: number | null;
+    stock: number;
+    published: boolean;
+    colors: { name: string; hex: string } | null;
+    products: { slug: string; name: string; sku: string } | null;
+    product_media: { path: string; alt: string; sort_order: number }[] | null;
+  } | null;
 };
 
 function mapLine(row: LineRow): CartLine | null {
@@ -208,9 +212,7 @@ export async function addToCart(
 
   const { data: variant, error: vError } = await admin
     .from('product_variants')
-    .select(
-      `id, stock, published, products!inner(id, published)`
-    )
+    .select(`id, stock, published, products!inner(id, published)`)
     .eq('id', variantId)
     .maybeSingle();
   if (vError) throw new Error(`variant: ${vError.message}`);
@@ -233,10 +235,7 @@ export async function addToCart(
 
   if (existing) {
     const newQty = Math.min(existing.qty + safeQty, variant.stock);
-    const { error } = await admin
-      .from('cart_items')
-      .update({ qty: newQty })
-      .eq('id', existing.id);
+    const { error } = await admin.from('cart_items').update({ qty: newQty }).eq('id', existing.id);
     if (error) throw new Error(`update qty: ${error.message}`);
   } else {
     const { error } = await admin
@@ -291,11 +290,7 @@ export async function removeItem(
   if (!cartId) return { ok: false, error: 'No hay carrito en esta sesión.', cartCount: 0 };
 
   // Verificamos que la línea sea del carrito de ESTA sesión.
-  const { error } = await admin
-    .from('cart_items')
-    .delete()
-    .eq('id', itemId)
-    .eq('cart_id', cartId);
+  const { error } = await admin.from('cart_items').delete().eq('id', itemId).eq('cart_id', cartId);
   if (error) throw new Error(`delete item: ${error.message}`);
   return { ok: true, cartCount: await getCartCount() };
 }
