@@ -1,0 +1,13 @@
+# Finales de línea uniformes: LF en el repo y en checkout.
+# Evita falsos "modified" con core.autocrlf=true en Windows y diffs fantasma
+# en el hook pre-commit (lint-staged restaura el stash y git ve CRLF vs LF).
+* text=auto eol=lf
+
+# Binarios del taller: jamás se renormalizan
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
